@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<script src="/socket.io.js"></script>
+<script src="/dojotoolkit/dojo/dojo.js"></script>
+<script>
+dojo.registerModulePath("dojox", "/dojotoolkit/dojox");
+dojo.registerModulePath("wow", "/wow");
+
+dojo.require("wow.Anymeta");
+var anymeta;
+dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
+  anymeta = new wow.Anymeta("http://www.mediamatic.net/services/rest/", oaa);
+});
+
+var socket = new io.Socket("localhost");
+socket.connect();
+socket.on("connect", function(){
+  console.log("connected");
+});
+socket.on("message", function(msg){
+  output(msg);
+  msg = JSON.parse(msg);
+  if(msg.type == "tag" && msg.state == "add"){
+    anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }).then(function(response){
+      console.dir(response);
+      output("Hi " + response.title);
+      anymeta.get("contact.list", { user_id: response.rsc_id, show: "private" }).then(function(response){
+        var contacts = [];
+        for(var i in response.contacts){
+          var c = response.contacts[i];
+          c._content && contacts.push(c);
+        }
+        output("<ul>" + contacts.map(function(c){
+          return "<li>" + c._content + "</li>";
+        }).join("") +  "</ul>");
+      });
+    });
+  }
+});
+
+function output(msg){
+  document.getElementById("output").innerHTML += msg + "<br>";
+}
+</script>
+</head>
+<body>
+<h1>Hello World</h1>
+<div id="output"></div>
+</body>
+</html>
