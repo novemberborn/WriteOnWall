@@ -41,11 +41,16 @@ class testApp : public ofBaseApp{
 		ofxCvGrayscaleImage		gImg;
 		ofxCvGrayscaleImage		bImg;
 	
+	ofxCvGrayscaleImage		h_Img;
+	ofxCvGrayscaleImage		s_Img;
+	ofxCvGrayscaleImage		b_Img;
+	
         ofxCvGrayscaleImage 	grayImage;
 		ofxCvGrayscaleImage 	grayBg;
 		ofxCvGrayscaleImage 	grayDiff;
 	
 		IplImage		*rgbComposite;
+	IplImage		*resultComposite;
 		ofxCvColorImage		brushImg;
 	
 

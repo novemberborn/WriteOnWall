@@ -24,11 +24,16 @@ void testApp::setup(){
 	gImg.allocate(320,240);
 	bImg.allocate(320,240);
 	
+	h_Img.allocate(320,240);
+	s_Img.allocate(320,240);
+	b_Img.allocate(320,240);
+
 	grayImage.allocate(320,240);
 	grayBg.allocate(320,240);
 	grayDiff.allocate(320,240);
 	
 	rgbComposite = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
+	resultComposite = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
 	brushImg.allocate(320,240);
 
 	bLearnBakground = true;
@@ -79,7 +84,28 @@ void testApp::update(){
 		cvCopy(colorImg.getCvImage(), rgbComposite, grayDiff.getCvImage());
 		//cvMerge(rImg.getCvImage(), gImg.getCvImage(), bImg.getCvImage(), grayDiff.getCvImage(), rgbComposite);
 		brushImg = rgbComposite;
-
+		
+		/*
+		 WERKT NIET!
+		 COMPILED WEL MAAR CRASHT ZONDER CXERROR.CPP
+		 Xcode could not locate source file: cxerror.cpp (line: 359)
+		 
+		 
+		// to hsb
+		brushImg.convertRgbToHsv();
+		brushImg.convertToGrayscalePlanarImages(h_Img, s_Img, b_Img);
+		
+		b_Img.brightnessContrast(0.8, 0.5);
+		cvMerge(h_Img.getCvImage(), s_Img.getCvImage(), b_Img.getCvImage(), NULL, resultComposite);
+		cvCvtColor(resultComposite, resultComposite, CV_HSV2RGB);
+		
+		brushImg = resultComposite;
+		
+		
+		 */
+		
+		
+		
 		/*
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
