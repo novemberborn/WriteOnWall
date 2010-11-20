@@ -95,11 +95,10 @@ void testApp::draw(){
 	// draw the incoming, the grayscale, the bg and the thresholded difference
 	ofSetColor(0xffffff);
 	
-#ifdef _USE_LIVE_VIDEO
+//#ifdef _FULLSCREEN
 
-	brushImg.draw(0,0, 1024, 768);
 
-#else
+//#else
 
 	colorImg.draw(0,0);
 	
@@ -112,8 +111,9 @@ void testApp::draw(){
 	grayDiff.draw(320,240);
 	
 	brushImg.draw(320,480);
+	brushImg.draw(1024, 0, 1024, 768);
 	
-#endif
+//#endif
 	
 
 	/*
@@ -133,14 +133,14 @@ void testApp::draw(){
         contourFinder.blobs[i].draw(320,480);
     }
 	 
+	 */
 	
 	// finally, a report:
 
 	ofSetColor(0xffffff);
 	char reportStr[1024];
-	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nnum blobs found %i, fps: %f", threshold, contourFinder.nBlobs, ofGetFrameRate());
+	//sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nnum blobs found %i, fps: %f", threshold, contourFinder.nBlobs, ofGetFrameRate());
 	ofDrawBitmapString(reportStr, 20, 600);
-	 */
 
 }
 
