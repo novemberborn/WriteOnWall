@@ -9,11 +9,11 @@ var fileServer = new static.Server("../web", { cache: 0 });
 var httpServer = http.Server(function(req, res){
   var info = url.parse(req.url, true);
   
-  if(info.pathname == "/tag"){
+  if(info.pathname.indexOf("/tag") == 0){
     var tag = "";
     req.on("data", function(chunk){ tag += chunk; });
     req.on("end", function(){
-      var msg = JSON.stringify({ type: "tag", state: req.method == "POST" ? "add" : "remove", data: tag });
+      var msg = JSON.stringify({ type: "tag", state: req.method == "POST" ? "add" : "remove", data: tag, id: info.pathname.split(/\//).pop() });
       console.log(msg);
       clients.forEach(function(client){
         client.send(msg);
