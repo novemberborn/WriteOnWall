@@ -9,6 +9,7 @@ html {
 <script src="/socket.io.js"></script>
 <script src="/dojotoolkit/dojo/dojo.js"></script>
 <script>
+dojo.require("dojo.fx");
 dojo.registerModulePath("dojox", "/dojotoolkit/dojox");
 dojo.registerModulePath("wow", "/wow");
 
@@ -42,7 +43,12 @@ socket.on("message", function(msg){
         start: 1,
         end: 0,
         onEnd: function(){
-          dojo.destroy(rendered);
+          dojo.fx.wipeOut({
+            node: rendered,
+            onEnd: function(){
+              dojo.destroy(rendered);
+            }
+          }).play();
         }
       }).play(2000);
     });
