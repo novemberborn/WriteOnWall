@@ -32,8 +32,10 @@ socket.on("message", function(msg){
   console.log("socket message:", msg);
   
   if(msg.type == "tag" && msg.state == "add"){
-    var tag = tags[msg.data] || (tags[msg.data] = anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }));
-    tag.then(function(thing){
+    var tag = tags[msg.data] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }).then(function(response){
+      return tags[msg.data] = response;
+    });
+    dojo.when(tag, function(thing){
       var rendered = dojo.create("p", {
         innerHTML: thing.title + " " + labels[msg.id] + " this"
       }, "overlay");
