@@ -22,6 +22,7 @@ var fileServer = new static.Server("../web", { cache: 0 });
 var httpServer = http.Server(function(req, res){
   var info = url.parse(req.url, true);
   
+  console.log(req.url);
   if(info.pathname.indexOf("/tag") == 0){
     var tag = "";
     var id = info.pathname.split(/\//).pop();
@@ -37,6 +38,8 @@ var httpServer = http.Server(function(req, res){
       
       if(id == "like" || id == "made"){
         actOnScreen(tag, id);
+      }else if(id == "clear"){
+        clearScreen(id);
       }
     });
   }else if(info.pathname == "/anymeta"){
@@ -74,13 +77,15 @@ function saveScreen(){
   }
   
   var dfd = defer();
-  applescript.execString('say "Please generate image"', function(){});
+  applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 36', function(){});
   outputQueue.push(dfd);
   return dfd.promise;
 }
 
 watch.createMonitor(outputDir, function(monitor){
   monitor.on("created", function(f){
+    if(!outputQueue.length){ return; }
+    
     var dfd = outputQueue.shift();
     fs.readFile(f).then(dfd.resolve.bind(dfd));
   });
@@ -147,4 +152,8 @@ function actOnScreen(tag, id){
         console.error("Couldn't find user for tag %s", tag);
       });
   });
+}
+
+function clearScreen(){
+  applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 49', function(){});
 }
