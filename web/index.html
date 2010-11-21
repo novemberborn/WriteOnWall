@@ -1,6 +1,11 @@
 <!doctype html>
 <html>
 <head>
+<style>
+html {
+  font: 200%/1.2 Georgia;
+}
+</style>
 <script src="/socket.io.js"></script>
 <script src="/dojotoolkit/dojo/dojo.js"></script>
 <script>
@@ -13,39 +18,39 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
   anymeta = new wow.Anymeta("http://www.mediamatic.net/services/rest/", oaa);
 });
 
+var tags = {};
+var labels = { like: "liked", made: "made" };
+
 var socket = new io.Socket("localhost");
 socket.connect();
 socket.on("connect", function(){
   console.log("connected");
 });
 socket.on("message", function(msg){
-  output(msg);
   msg = JSON.parse(msg);
+  console.log("socket message:", msg);
+  
   if(msg.type == "tag" && msg.state == "add"){
-    anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }).then(function(response){
-      console.dir(response);
-      output("Hi " + response.title);
-      anymeta.get("contact.list", { user_id: response.rsc_id, show: "private" }).then(function(response){
-        var contacts = [];
-        for(var i in response.contacts){
-          var c = response.contacts[i];
-          c._content && contacts.push(c);
+    var tag = tags[msg.data] || (tags[msg.data] = anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }));
+    tag.then(function(thing){
+      var rendered = dojo.create("p", {
+        innerHTML: thing.title + " " + labels[msg.id] + " this"
+      }, "overlay");
+      dojo.fadeIn({ node: rendered, start: 0 }).play();
+      dojo.fadeOut({
+        node: rendered,
+        start: 1,
+        end: 0,
+        onEnd: function(){
+          dojo.destroy(rendered);
         }
-        output("<ul>" + contacts.map(function(c){
-          return "<li>" + c._content + "</li>";
-        }).join("") +  "</ul>");
-      });
+      }).play(2000);
     });
   }
 });
-
-function output(msg){
-  document.getElementById("output").innerHTML += msg + "<br>";
-}
 </script>
 </head>
 <body>
-<h1>Hello World</h1>
-<div id="output"></div>
+  <div id="overlay"></div>
 </body>
 </html>
