@@ -14,6 +14,7 @@ void testApp::setup(){
 	#endif
 
     colorImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	outputImage.allocate(_CAM_WIDTH, _CAM_HEIGHT, OF_IMAGE_COLOR);
 	hsbImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	
 	hueImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
@@ -184,6 +185,12 @@ void testApp::draw(){
 }
 
 
+string createName() {
+	stringstream s1;
+	s1 << "wallimage" << ofGetSystemTime() << ".png";
+	return s1.str();
+}
+
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 
@@ -197,8 +204,10 @@ void testApp::keyPressed  (int key){
 			bClearBackground = true;
 			break;
 		// Use the enter key to select the source
-		case '\n':
+		case 13:
 			// SAVE image
+			outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
+			outputImage.saveImage(createName());
 			break;
 		// Use the s key to select the source
 		case 's':

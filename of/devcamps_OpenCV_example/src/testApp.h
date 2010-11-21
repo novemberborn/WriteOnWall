@@ -65,7 +65,8 @@ class testApp : public ofBaseApp{
 	ofxCvColorImage		brushImg;
 	ofxCvColorImage		improvedBrushImg;
 
-
+	ofImage outputImage;
+	
 	ofxCvContourFinder 	contourFinder;
 
 	int 				threshold;
