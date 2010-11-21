@@ -10,6 +10,14 @@ var http = require("http"),
     watch = require("watch"),
     anymeta = require("./anymeta");
 
+var outputDir = process.argv[2];
+if(!outputDir){
+  console.error("No output dir specified!");
+  process.exit(1);
+}else{
+  console.log("Monitoring <%s> for screens", outputDir);
+}
+
 var fileServer = new static.Server("../web", { cache: 0 });
 var httpServer = http.Server(function(req, res){
   var info = url.parse(req.url, true);
@@ -71,7 +79,7 @@ function saveScreen(){
   return dfd.promise;
 }
 
-watch.createMonitor("../output", function(monitor){
+watch.createMonitor(outputDir, function(monitor){
   monitor.on("created", function(f){
     var dfd = outputQueue.shift();
     fs.readFile(f).then(dfd.resolve.bind(dfd));
