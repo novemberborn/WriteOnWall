@@ -1,9 +1,14 @@
 var http = require("http"),
     url = require("url"),
     static = require("node-static"),
+    fs = require("promised-io/fs"),
     when = require("promised-io/promise").when,
+    defer = require("promised-io/promise").defer,
     request = require("promised-io/http-client").request,
-    io = require("socket.io");
+    io = require("socket.io"),
+    applescript = require("applescript"),
+    watch = require("watch"),
+    anymeta = require("./anymeta");
 
 var fileServer = new static.Server("../web", { cache: 0 });
 var httpServer = http.Server(function(req, res){
@@ -11,15 +16,20 @@ var httpServer = http.Server(function(req, res){
   
   if(info.pathname.indexOf("/tag") == 0){
     var tag = "";
+    var id = info.pathname.split(/\//).pop();
     req.on("data", function(chunk){ tag += chunk; });
     req.on("end", function(){
-      var msg = JSON.stringify({ type: "tag", state: req.method == "POST" ? "add" : "remove", data: tag, id: info.pathname.split(/\//).pop() });
+      var msg = JSON.stringify({ type: "tag", state: req.method == "POST" ? "add" : "remove", data: tag, id: id });
       console.log(msg);
       clients.forEach(function(client){
         client.send(msg);
       });
       res.writeHead(200);
       res.end();
+      
+      if(id == "like" || id == "made"){
+        actOnScreen(tag, id);
+      }
     });
   }else if(info.pathname == "/anymeta"){
     // TODO: POST requests
@@ -47,3 +57,86 @@ socket.on("connection", function(client){
   });
 });
 httpServer.listen(8080, "0.0.0.0");
+
+var outputQueue = [];
+
+function saveScreen(){
+  if(outputQueue.length > 0){
+    return outputQueue[0].promise;
+  }
+  
+  var dfd = defer();
+  applescript.execString('say "Please generate image"', function(){});
+  outputQueue.push(dfd);
+  return dfd.promise;
+}
+
+watch.createMonitor("../output", function(monitor){
+  monitor.on("created", function(f){
+    var dfd = outputQueue.shift();
+    fs.readFile(f).then(dfd.resolve.bind(dfd));
+  });
+});
+
+var tags = {};
+function identifyUser(tag){
+  return tags[tag] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + tag }).then(function(user){
+    return tags[tag] = user;
+  });
+}
+
+var lastScreen;
+var USE_LAST_FOR = 5000;
+function actOnScreen(tag, id){
+  var user = identifyUser(tag);
+  var screen;
+  if(lastScreen && Date.now() - lastScreen.time < USE_LAST_FOR){
+    screen = lastScreen.screen;
+  }else{
+    screen = saveScreen();
+    screen.then(function(img){
+      lastScreen = {
+        screen: img,
+        time: Date.now()
+      };
+    });
+  }
+  when(screen, function(img){
+    when(user, function(user){
+        console.log("Identified user for tag %s", tag);
+        // console.dir(user);
+        
+        var attachment = img.attachment;
+        if(!attachment){
+          attachment = img.attachment = anymeta.post("anymeta.attachment.create", {
+            data: img.toString("base64"),
+            mime: "image/png"
+          }).then(function(response){
+            console.log("Uploaded image");
+            // console.dir(response);
+            return response;
+          });
+        }
+        
+        when(attachment, function(response){
+          console.log("Adding edge…");
+          var params = {
+            id: response.thg_id,
+            object: user.rsc_id
+          };
+          if(id == "like"){
+            params.predicate = "ACTOR";
+          }else{
+            params.predicate = "AUTHOR";
+          }
+          anymeta.post("anymeta.edge.add", params).then(function(response){
+            console.log("Added edge");
+            console.dir(response);
+          });
+        });
+      },
+      function(err){
+        console.error("Couldn't find user for tag %s", tag);
+      });
+  });
+}
