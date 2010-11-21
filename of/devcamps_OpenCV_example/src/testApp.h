@@ -10,54 +10,65 @@
 
 //#define _FULLSCREEN
 
+#define _CAM_WIDTH 640
+#define _CAM_HEIGHT 480
+
+#define _SCREEN_WIDTH 1024
+#define _SCREEN_HEIGHT 768
+#define _SCREEN_OFFSET_X 1024
+#define _SCREEN_OFFSET_Y 0
+
 class testApp : public ofBaseApp{
 
 	public:
 
-		void setup();
-		void update();
-		void draw();
+	void setup();
+	void update();
+	void draw();
 
-		void keyPressed  (int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void windowResized(int w, int h);
+	void keyPressed  (int key);
+	void mouseMoved(int x, int y );
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseReleased(int x, int y, int button);
+	void windowResized(int w, int h);
 
-        #ifdef _USE_LIVE_VIDEO
-		  ofVideoGrabber 		vidGrabber;
-		#else
-		  ofVideoPlayer 		vidPlayer;
-		#endif
+#ifdef _USE_LIVE_VIDEO
+	ofVideoGrabber 		vidGrabber;
+	#else
+	ofVideoPlayer 		vidPlayer;
+#endif
 
-		ofxCvColorImage		colorImg, hsbImg;
+	ofxCvColorImage		colorImg, hsbImg;
 
-		ofxCvGrayscaleImage		hueImg;
-		ofxCvGrayscaleImage		satImg;
-		ofxCvGrayscaleImage		briImg;
+	ofxCvGrayscaleImage		hueImg;
+	ofxCvGrayscaleImage		satImg;
+	ofxCvGrayscaleImage		briImg;
 
-		ofxCvGrayscaleImage		rImg;
-		ofxCvGrayscaleImage		gImg;
-		ofxCvGrayscaleImage		bImg;
+	ofxCvGrayscaleImage		rImg;
+	ofxCvGrayscaleImage		gImg;
+	ofxCvGrayscaleImage		bImg;
 	
 	ofxCvGrayscaleImage		h_Img;
 	ofxCvGrayscaleImage		s_Img;
 	ofxCvGrayscaleImage		b_Img;
 	
-        ofxCvGrayscaleImage 	grayImage;
-		ofxCvGrayscaleImage 	grayBg;
-		ofxCvGrayscaleImage 	grayDiff;
-	
-		IplImage		*rgbComposite;
-	IplImage		*resultComposite;
-		ofxCvColorImage		brushImg;
-	
+	ofxCvGrayscaleImage 	grayImage;
+	ofxCvGrayscaleImage 	grayBg;
+	ofxCvGrayscaleImage 	grayDiff;
 
-        //ofxCvContourFinder 	contourFinder;
+	IplImage			*rgbComposite;
+	IplImage			*resultComposite;
 
-		int 				threshold;
-		bool				bLearnBakground;
+	ofxCvColorImage		brushImg;
+	ofxCvColorImage		improvedBrushImg;
+
+
+	ofxCvContourFinder 	contourFinder;
+
+	int 				threshold;
+	bool				bLearnBackground;
+	bool				bClearBackground;
 
 
 };

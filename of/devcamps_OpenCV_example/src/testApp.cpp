@@ -7,36 +7,38 @@ void testApp::setup(){
 
 	#ifdef _USE_LIVE_VIDEO
         vidGrabber.setVerbose(true);
-        vidGrabber.initGrabber(320,240);
+        vidGrabber.initGrabber(_CAM_WIDTH, _CAM_HEIGHT);
 	#else
         vidPlayer.loadMovie("fingers.mov");
         vidPlayer.play();
 	#endif
 
-    colorImg.allocate(320,240);
-	hsbImg.allocate(320,240);
+    colorImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	hsbImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	
-	hueImg.allocate(320,240);
-	satImg.allocate(320,240);
-	briImg.allocate(320,240);
+	hueImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	satImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	briImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	
-	rImg.allocate(320,240);
-	gImg.allocate(320,240);
-	bImg.allocate(320,240);
+	rImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	gImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	bImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	
-	h_Img.allocate(320,240);
-	s_Img.allocate(320,240);
-	b_Img.allocate(320,240);
+	h_Img.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	s_Img.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	b_Img.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 
-	grayImage.allocate(320,240);
-	grayBg.allocate(320,240);
-	grayDiff.allocate(320,240);
+	grayImage.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	grayBg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	grayDiff.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	
-	rgbComposite = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
-	resultComposite = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
-	brushImg.allocate(320,240);
+	rgbComposite = cvCreateImage(cvSize(_CAM_WIDTH, _CAM_HEIGHT), IPL_DEPTH_8U, 3);
+	resultComposite = cvCreateImage(cvSize(_CAM_WIDTH, _CAM_HEIGHT), IPL_DEPTH_8U, 3);
+	
+	brushImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
+	improvedBrushImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 
-	bLearnBakground = true;
+	bLearnBackground = true;
 	threshold = 80;
 }
 
@@ -57,9 +59,9 @@ void testApp::update(){
 	if (bNewFrame){
 
 		#ifdef _USE_LIVE_VIDEO
-            colorImg.setFromPixels(vidGrabber.getPixels(), 320,240);
+            colorImg.setFromPixels(vidGrabber.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
 	    #else
-            colorImg.setFromPixels(vidPlayer.getPixels(), 320,240);
+            colorImg.setFromPixels(vidPlayer.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
         #endif
 		
 		hsbImg = colorImg;
@@ -68,9 +70,9 @@ void testApp::update(){
 		
 
         grayImage = briImg;
-		if (bLearnBakground == true){
+		if (bLearnBackground == true){
 			grayBg = grayImage;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-			bLearnBakground = false;
+			bLearnBackground = false;
 		}
 
 		// take the abs value of the difference between background and incoming and then threshold:
@@ -80,9 +82,11 @@ void testApp::update(){
 		//
 		
 		colorImg.convertToGrayscalePlanarImages(rImg, gImg, bImg);
-		//cv
+		if (bClearBackground == true) {
+			cvZero(rgbComposite);
+			bClearBackground = false;
+		}
 		cvCopy(colorImg.getCvImage(), rgbComposite, grayDiff.getCvImage());
-		//cvMerge(rImg.getCvImage(), gImg.getCvImage(), bImg.getCvImage(), grayDiff.getCvImage(), rgbComposite);
 		brushImg = rgbComposite;
 		
 		/*
@@ -92,7 +96,7 @@ void testApp::update(){
 		 
 		*/
 		
-		
+		/*
 		// to hsb
 		brushImg.convertRgbToHsv();
 		brushImg.convertToGrayscalePlanarImages(h_Img, s_Img, b_Img);
@@ -105,16 +109,14 @@ void testApp::update(){
 		
 		brushImg = resultComposite;
 		
+		*/
 		
 		
 		
 		
-		
-		/*
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
-		contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
-		*/
+		contourFinder.findContours(grayDiff, 20, (_CAM_WIDTH * _CAM_HEIGHT)/3, 10, true);	// find holes
 	}
 
 }
@@ -130,46 +132,51 @@ void testApp::draw(){
 
 //#else
 
-	colorImg.draw(0,0);
+	int w_preview = 320;
+	int h_preview = 240;
+	int w_preview_small = 160;
+	int h_preview_small = 120;
 	
-	hueImg.draw(640, 0);
-	satImg.draw(640, 240);
-	briImg.draw(640, 480);
+	colorImg.draw(0,0, w_preview, h_preview);
 	
-	grayImage.draw(320,0);
-	grayBg.draw(0,240);
-	grayDiff.draw(320,240);
+	hueImg.draw(320, 0, w_preview_small, h_preview_small);
+	satImg.draw(480, 0, w_preview_small, h_preview_small);
+	briImg.draw(640, 0, w_preview_small, h_preview_small);
+	grayImage.draw(800,0, w_preview_small, h_preview_small);
 	
-	brushImg.draw(320,480);
-	brushImg.draw(1024, 0, 1024, 768);
+	grayBg.draw(320,120, w_preview_small, h_preview_small);
+	
+	grayDiff.draw(0, 240, w_preview, h_preview);
+	
+	brushImg.draw(320, 240, w_preview, h_preview);
+	
+	brushImg.draw(_SCREEN_OFFSET_X, _SCREEN_OFFSET_Y, _SCREEN_WIDTH, _SCREEN_HEIGHT);
 	
 //#endif
 	
 
-	/*
 	 // then draw the contours:
 	 
 	ofFill();
 	ofSetColor(0x333333);
-	ofRect(320,480,320,240);
+	ofRect(640,240, w_preview, h_preview);
 	ofSetColor(0xffffff);
 
 	// we could draw the whole contour finder
-	//contourFinder.draw(360,540);
+	contourFinder.draw(480,120, w_preview_small, h_preview_small);
 
 	// or, instead we can draw each blob individually,
 	// this is how to get access to them:
     for (int i = 0; i < contourFinder.nBlobs; i++){
-        contourFinder.blobs[i].draw(320,480);
+        contourFinder.blobs[i].draw(320, 240);
     }
 	 
-	 */
 	
 	// finally, a report:
 
 	ofSetColor(0xffffff);
 	char reportStr[1024];
-	//sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nnum blobs found %i, fps: %f", threshold, contourFinder.nBlobs, ofGetFrameRate());
+	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nnum blobs found %i, fps: %f", threshold, contourFinder.nBlobs, ofGetFrameRate());
 	ofDrawBitmapString(reportStr, 20, 600);
 
 }
@@ -179,15 +186,31 @@ void testApp::draw(){
 void testApp::keyPressed  (int key){
 
 	switch (key){
-		case ' ':
-			bLearnBakground = true;
+		// Use the b key to learn the background
+		case 'b':
+			bLearnBackground = true;
 			break;
+		// Use the spacebar to clear the image
+		case ' ':
+			bClearBackground = true;
+			break;
+		// Use the enter key to select the source
+		case '\n':
+			// SAVE image
+			break;
+		// Use the s key to select the source
+		case 's':
+			vidGrabber.videoSettings();
+			break;
+		// Adjust the treshold of the contour with - / +
+		// in steps of 1,
+		// with SHIFT: in steps of 10
 		case '-':
 			threshold ++;
 			if (threshold > 255) threshold = 255;
 			break;
 		case '_':
-			threshold ++;
+			threshold += 10;
 			if (threshold > 255) threshold = 255;
 			break;
 		case '=':
@@ -195,11 +218,8 @@ void testApp::keyPressed  (int key){
 			if (threshold < 0) threshold = 0;
 			break;
 		case '+':
-			threshold --;
+			threshold -= 10;
 			if (threshold < 0) threshold = 0;
-			break;
-		case 's':
-			vidGrabber.videoSettings();
 			break;
 	}
 }
