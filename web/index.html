@@ -4,6 +4,7 @@
 <style>
 html {
   font: 200%/1.2 Georgia;
+  color:#FFF;
 }
 </style>
 <script src="/socket.io.js"></script>
@@ -20,7 +21,7 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
 });
 
 var tags = {};
-var labels = { like: "liked", made: "made" };
+var labels = { like: "liked", made: "made", clear: "cleared" };
 
 var socket = new io.Socket("localhost");
 socket.connect();
