@@ -90,19 +90,23 @@ void testApp::update(){
 		 COMPILED WEL MAAR CRASHT ZONDER CXERROR.CPP
 		 Xcode could not locate source file: cxerror.cpp (line: 359)
 		 
-		 
+		*/
+		
+		
 		// to hsb
 		brushImg.convertRgbToHsv();
 		brushImg.convertToGrayscalePlanarImages(h_Img, s_Img, b_Img);
 		
-		b_Img.brightnessContrast(0.8, 0.5);
+		// THIS IS THE LINE OF CODE IT CRASHES ON RIGHT NOW
+		//b_Img.brightnessContrast(50, 50);
+		
 		cvMerge(h_Img.getCvImage(), s_Img.getCvImage(), b_Img.getCvImage(), NULL, resultComposite);
 		cvCvtColor(resultComposite, resultComposite, CV_HSV2RGB);
 		
 		brushImg = resultComposite;
 		
 		
-		 */
+		
 		
 		
 		
