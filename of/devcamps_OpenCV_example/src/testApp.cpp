@@ -58,11 +58,11 @@ void testApp::update(){
 
 	if (bNewFrame){
 
-		#ifdef _USE_LIVE_VIDEO
-            colorImg.setFromPixels(vidGrabber.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
-	    #else
-            colorImg.setFromPixels(vidPlayer.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
-        #endif
+#ifdef _USE_LIVE_VIDEO
+		colorImg.setFromPixels(vidGrabber.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
+#else
+		colorImg.setFromPixels(vidPlayer.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
+#endif
 		
 		hsbImg = colorImg;
 		hsbImg.convertRgbToHsv();
@@ -75,10 +75,12 @@ void testApp::update(){
 			bLearnBackground = false;
 		}
 
-		// take the abs value of the difference between background and incoming and then threshold:
+#ifdef _FILTER_BACKGROUND_WITH_DIFF
+		// take the abs value of the difference between background and incoming:
 		grayDiff.absDiff(grayBg, grayImage);
+#endif	
+		// and then threshold:
 		grayDiff.threshold(threshold);
-		
 		//
 		
 		colorImg.convertToGrayscalePlanarImages(rImg, gImg, bImg);

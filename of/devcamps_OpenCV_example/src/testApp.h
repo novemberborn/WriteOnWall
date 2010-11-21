@@ -8,6 +8,8 @@
 #define _USE_LIVE_VIDEO		// uncomment this to use a live camera
 								// otherwise, we'll use a movie file
 
+#define _FILTER_BACKGROUND_WITH_DIFF // uncomment this to difference the background image
+
 //#define _FULLSCREEN
 
 #define _CAM_WIDTH 640
