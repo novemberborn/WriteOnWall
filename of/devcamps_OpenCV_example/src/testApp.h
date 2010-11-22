@@ -82,6 +82,19 @@ class testApp : public ofBaseApp{
 	
 	ofxPoint2f screenSourcePoints[4];
 	ofxPoint2f screenDestPoints[4];
+	
+	int quadAx;
+	int quadAy;
+	int quadBx;
+	int quadBy;
+	int quadCx;
+	int quadCy;
+	int quadDx;
+	int quadDy;
+	
+	int selectedQuadPoint;
+	int *selectQuadx;
+	int *selectQuady;
 
 };
 

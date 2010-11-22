@@ -51,10 +51,25 @@ void testApp::setup(){
 
 	// test values
 	// TODO get these from an XML file
-	screenDestPoints[0].set(20.0, 20.0);
-	screenDestPoints[1].set(600.0, 40.0);
-	screenDestPoints[2].set(-40.0, 400.0);
-	screenDestPoints[3].set(500.0, 550.0);
+	
+	// Default values:
+	quadAx = 20;
+	quadAy = 20;
+	quadBx = 600;
+	quadBy = 40;
+	quadCx = -40;
+	quadCy = 400;
+	quadDx = 500;
+	quadDy = 550;
+	
+	selectedQuadPoint = 0;
+	selectQuadx = NULL;
+	selectQuady = NULL;
+	
+	screenDestPoints[0].set(quadAx, quadAy);
+	screenDestPoints[1].set(quadBx, quadBy);
+	screenDestPoints[2].set(quadCx, quadCy);
+	screenDestPoints[3].set(quadDx, quadDy);
 	
 }
 
@@ -132,7 +147,35 @@ void testApp::update(){
 		
 		*/
 		
+		// Set the pointer to the quad ints
 		
+		switch (selectedQuadPoint) {
+			case 1:
+				selectQuadx = &quadAx;
+				selectQuady = &quadAy;
+				break;
+			case 2:
+				selectQuadx = &quadBx;
+				selectQuady = &quadBy;
+				break;
+			case 3:
+				selectQuadx = &quadCx;
+				selectQuady = &quadCy;
+				break;
+			case 4:
+				selectQuadx = &quadDx;
+				selectQuady = &quadDy;
+				break;
+			default:
+				selectQuadx = NULL;
+				selectQuady = NULL;
+				break;
+		}
+		
+		screenDestPoints[0].set(quadAx, quadAy);
+		screenDestPoints[1].set(quadBx, quadBy);
+		screenDestPoints[2].set(quadCx, quadCy);
+		screenDestPoints[3].set(quadDx, quadDy);
 		
 		
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
@@ -158,8 +201,11 @@ void testApp::draw(){
 	int w_preview_small = 160;
 	int h_preview_small = 120;
 	
-	cameraImg.draw(640, 480, w_preview, h_preview);
-	colorImg.draw(0,0, w_preview, h_preview);
+	int colorImgOffsetX = 320;
+	int colorImgOffsetY = 240;
+	
+	cameraImg.draw(0, 0, w_preview, h_preview);
+	colorImg.draw(colorImgOffsetX, colorImgOffsetY, w_preview, h_preview);
 	
 	hueImg.draw(320, 0, w_preview_small, h_preview_small);
 	satImg.draw(480, 0, w_preview_small, h_preview_small);
@@ -170,7 +216,54 @@ void testApp::draw(){
 	
 	grayDiff.draw(0, 240, w_preview, h_preview);
 	
-	brushImg.draw(320, 240, w_preview, h_preview);
+	brushImg.draw(640, 480, w_preview, h_preview);
+	
+	// Draw the Quad Warp Points
+	int anchorSize = 8;
+	int anchorOffset = 4;
+	float scaleAspect = w_preview /(_CAM_WIDTH * 1.0);
+	// A
+	if (selectedQuadPoint == 1) {
+		ofFill();
+		ofSetColor(0xffffff);
+	} else {
+		ofNoFill();
+		ofSetColor(0xaaaaaa);
+	}
+	// B
+	ofRect((colorImgOffsetX - anchorOffset) + (quadAx * scaleAspect),
+		   (colorImgOffsetY - anchorOffset) + (quadAy * scaleAspect), anchorSize, anchorSize);
+	if (selectedQuadPoint == 2) {
+		ofFill();
+		ofSetColor(0xffffff);
+	} else {
+		ofNoFill();
+		ofSetColor(0xaaaaaa);
+	}
+	// C
+	ofRect((colorImgOffsetX - anchorOffset) + (quadBx * scaleAspect),
+		   (colorImgOffsetY - anchorOffset) + (quadBy * scaleAspect), anchorSize, anchorSize);
+	if (selectedQuadPoint == 3) {
+		ofFill();
+		ofSetColor(0xffffff);
+	} else {
+		ofNoFill();
+		ofSetColor(0xaaaaaa);
+	}
+	// D
+	ofRect((colorImgOffsetX - anchorOffset) + (quadCx * scaleAspect),
+		   (colorImgOffsetY - anchorOffset) + (quadCy * scaleAspect), anchorSize, anchorSize);
+	if (selectedQuadPoint == 4) {
+		ofFill();
+		ofSetColor(0xffffff);
+	} else {
+		ofNoFill();
+		ofSetColor(0xaaaaaa);
+	}
+	ofRect((colorImgOffsetX - anchorOffset) + (quadDx * scaleAspect),
+		   (colorImgOffsetY - anchorOffset) + (quadDy * scaleAspect), anchorSize, anchorSize);
+	ofSetColor(0xffffff);
+	
 	
 	//
 	// Adjust the projected image size to fit the multiple(?) beamer setup
@@ -219,8 +312,20 @@ void testApp::draw(){
 
 	ofSetColor(0xffffff);
 	char reportStr[1024];
-	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nnum blobs found %i, fps: %f", threshold, contourFinder.nBlobs, ofGetFrameRate());
-	ofDrawBitmapString(reportStr, 20, 600);
+	sprintf(reportStr, "bg subtraction and blob detection\n\
+press 'b' to capture bg\n\
+press 's' to control the video settings\n\
+press ' ' to clear the image\n\
+press ENTER to save the image\n\
+threshold %i (press: +/-) (shift +/-:  +10/-10)\n\
+press '[' / ']' to select a quad point\n\
+use ARROW keys to move the selected point around\n\
+quad A: (%i, %i), quad B: (%i, %i)\n\
+quad C: (%i, %i), quad D: (%i, %i)\n\
+num blobs found %i, fps: %f", threshold, quadAx, quadAy, quadBx, quadBy,
+			quadCx, quadCy, quadDx, quadDy,
+			contourFinder.nBlobs, ofGetFrameRate());
+	ofDrawBitmapString(reportStr, 20, 500);
 
 }
 
@@ -256,6 +361,41 @@ void testApp::keyPressed  (int key){
 		case 's':
 			vidGrabber.videoSettings();
 			break;
+		// Adjust the quad warps
+		// '['  and ']' for selecting the A, B, C or D (or none)
+		// Arrow keys for moving the quad corner around
+		case '[':
+			selectedQuadPoint --;
+			if (selectedQuadPoint < 0) selectedQuadPoint = 4;
+			break;
+		case ']':
+			selectedQuadPoint ++;
+			if (selectedQuadPoint > 4) selectedQuadPoint = 0;
+			break;
+		// LEFT
+		case 356:
+			if ( selectQuadx != NULL) {
+				(* selectQuadx) --;
+			}
+			break;
+		// RIGHT
+		case 358:
+			if ( selectQuadx != NULL) {
+				(* selectQuadx) ++;
+			}
+			break;
+		// UP
+		case 357:
+			if ( selectQuady != NULL) {
+				(* selectQuady) --;
+			}
+			break;
+		// DOWN
+		case 359:
+			if ( selectQuady != NULL) {
+				(* selectQuady) ++;
+			}
+			break;
 		// Adjust the treshold of the contour with - / +
 		// in steps of 1,
 		// with SHIFT: in steps of 10
@@ -274,6 +414,9 @@ void testApp::keyPressed  (int key){
 		case '+':
 			threshold -= 10;
 			if (threshold < 0) threshold = 0;
+			break;
+		default:
+			cout << "unhandled key: " << key << "\n";
 			break;
 	}
 }
