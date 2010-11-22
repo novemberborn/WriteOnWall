@@ -172,7 +172,27 @@ void testApp::draw(){
 	
 	brushImg.draw(320, 240, w_preview, h_preview);
 	
-	brushImg.draw(_SCREEN_OFFSET_X, _SCREEN_OFFSET_Y, _SCREEN_WIDTH, _SCREEN_HEIGHT);
+	//
+	// Adjust the projected image size to fit the multiple(?) beamer setup
+	int adjustedScreenOffsetY = _SCREEN_OFFSET_Y;
+	int adjustedScreenHeight = _SCREEN_HEIGHT;
+	// check if the aspect ratio of the projection is wider than that of the camera
+	float aspect_cam = _CAM_HEIGHT / (_CAM_WIDTH * 1.0);
+	float aspect_out = _SCREEN_HEIGHT / (_SCREEN_WIDTH * 1.0);
+	if ( aspect_cam > aspect_out ) {
+		adjustedScreenHeight = _SCREEN_WIDTH * aspect_cam;
+		adjustedScreenOffsetY = _SCREEN_OFFSET_Y - ((adjustedScreenHeight - _SCREEN_HEIGHT) / 2);
+	}
+
+	int offsetx = _SCREEN_OFFSET_X;
+	int screenw = _SCREEN_WIDTH;
+	/*
+	cout << "aspect_cam" << aspect_cam << "aspect_out" << aspect_out << "\n";
+	brushImg.draw(1024, -192, 1536, 1152);
+	cout << "brushImg.draw(1024, -192, 1536, 1152);\n";
+	cout << offsetx << " " << adjustedScreenOffsetY << " " << screenw << " " << adjustedScreenHeight << "\n";
+	*/
+	brushImg.draw(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
 	
 //#endif
 	
@@ -226,7 +246,9 @@ void testApp::keyPressed  (int key){
 		// Use the enter key to select the source
 		case 13:
 			// SAVE image
+#ifdef _MIRROR_OUTPUT_IMAGE
 			brushImg.mirror(false, true);
+#endif
 			outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
 			outputImage.saveImage(createName());
 			break;

@@ -11,12 +11,16 @@
 
 #define _FILTER_BACKGROUND_WITH_DIFF // uncomment this to difference the background image
 
+#define _MIRROR_OUTPUT_IMAGE // uncomment when you're not using rear projection
+
+
 //#define _FULLSCREEN
 
 #define _CAM_WIDTH 640
 #define _CAM_HEIGHT 480
 
-#define _SCREEN_WIDTH 1024
+#define _SCREEN_WIDTH 1536
+//#define _SCREEN_WIDTH 1024
 #define _SCREEN_HEIGHT 768
 #define _SCREEN_OFFSET_X 1024
 #define _SCREEN_OFFSET_Y 0
