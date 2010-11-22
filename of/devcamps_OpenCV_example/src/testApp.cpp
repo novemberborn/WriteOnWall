@@ -226,6 +226,7 @@ void testApp::keyPressed  (int key){
 		// Use the enter key to select the source
 		case 13:
 			// SAVE image
+			brushImg.mirror(false, true);
 			outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
 			outputImage.saveImage(createName());
 			break;
