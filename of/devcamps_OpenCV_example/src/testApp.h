@@ -4,6 +4,7 @@
 #include "ofMain.h"
 
 #include "ofxOpenCv.h"
+#include "ofxVectorMath.h"
 
 #define _USE_LIVE_VIDEO		// uncomment this to use a live camera
 								// otherwise, we'll use a movie file
@@ -41,7 +42,9 @@ class testApp : public ofBaseApp{
 	ofVideoPlayer 		vidPlayer;
 #endif
 
-	ofxCvColorImage		colorImg, hsbImg;
+	ofxCvColorImage		cameraImg;
+	ofxCvColorImage		colorImg;
+	ofxCvColorImage		hsbImg;
 
 	ofxCvGrayscaleImage		hueImg;
 	ofxCvGrayscaleImage		satImg;
@@ -72,7 +75,9 @@ class testApp : public ofBaseApp{
 	int 				threshold;
 	bool				bLearnBackground;
 	bool				bClearBackground;
-
+	
+	ofxPoint2f screenSourcePoints[4];
+	ofxPoint2f screenDestPoints[4];
 
 };
 

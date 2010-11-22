@@ -12,7 +12,8 @@ void testApp::setup(){
         vidPlayer.loadMovie("fingers.mov");
         vidPlayer.play();
 	#endif
-
+	
+	cameraImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
     colorImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 	outputImage.allocate(_CAM_WIDTH, _CAM_HEIGHT, OF_IMAGE_COLOR);
 	hsbImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
@@ -41,6 +42,20 @@ void testApp::setup(){
 
 	bLearnBackground = true;
 	threshold = 80;
+	
+	// Quad Warping
+	screenSourcePoints[0].set(0.0, 0.0);
+	screenSourcePoints[1].set(_CAM_WIDTH, 0.0);
+	screenSourcePoints[2].set(0.0, _CAM_HEIGHT);
+	screenSourcePoints[3].set(_CAM_WIDTH, _CAM_HEIGHT);
+
+	// test values
+	// TODO get these from an XML file
+	screenDestPoints[0].set(20.0, 20.0);
+	screenDestPoints[1].set(600.0, 40.0);
+	screenDestPoints[2].set(-40.0, 400.0);
+	screenDestPoints[3].set(500.0, 550.0);
+	
 }
 
 //--------------------------------------------------------------
@@ -60,10 +75,13 @@ void testApp::update(){
 	if (bNewFrame){
 
 #ifdef _USE_LIVE_VIDEO
-		colorImg.setFromPixels(vidGrabber.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
+		cameraImg.setFromPixels(vidGrabber.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
 #else
-		colorImg.setFromPixels(vidPlayer.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
+		cameraImg.setFromPixels(vidPlayer.getPixels(), _CAM_WIDTH, _CAM_HEIGHT);
 #endif
+
+		// Warp the camera image onto the projected image
+		colorImg.warpIntoMe(cameraImg, screenSourcePoints, screenDestPoints);
 		
 		hsbImg = colorImg;
 		hsbImg.convertRgbToHsv();
@@ -140,6 +158,7 @@ void testApp::draw(){
 	int w_preview_small = 160;
 	int h_preview_small = 120;
 	
+	cameraImg.draw(640, 480, w_preview, h_preview);
 	colorImg.draw(0,0, w_preview, h_preview);
 	
 	hueImg.draw(320, 0, w_preview_small, h_preview_small);
@@ -166,14 +185,15 @@ void testApp::draw(){
 	ofSetColor(0xffffff);
 
 	// we could draw the whole contour finder
-	contourFinder.draw(480,120, w_preview_small, h_preview_small);
+	contourFinder.draw(640,240, w_preview, h_preview);
 
+	/*
 	// or, instead we can draw each blob individually,
 	// this is how to get access to them:
     for (int i = 0; i < contourFinder.nBlobs; i++){
         contourFinder.blobs[i].draw(320, 240);
     }
-	 
+	*/
 	
 	// finally, a report:
 

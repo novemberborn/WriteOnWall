@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43F4BF2F1299E97B00B4BC8B /* ofxMatrix3x3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF221299E97B00B4BC8B /* ofxMatrix3x3.cpp */; };
+		43F4BF301299E97B00B4BC8B /* ofxMatrix4x4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF241299E97B00B4BC8B /* ofxMatrix4x4.cpp */; };
+		43F4BF311299E97B00B4BC8B /* ofxQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF291299E97B00B4BC8B /* ofxQuaternion.cpp */; };
 		E44667570F5B3E04005D0BF0 /* ofxCvColorImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E446667D0F5B3E04005D0BF0 /* ofxCvColorImage.cpp */; };
 		E44667580F5B3E04005D0BF0 /* ofxCvContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E44666800F5B3E04005D0BF0 /* ofxCvContourFinder.cpp */; };
 		E44667590F5B3E04005D0BF0 /* ofxCvFloatImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E44666820F5B3E04005D0BF0 /* ofxCvFloatImage.cpp */; };
@@ -85,6 +88,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		43F4BF201299E97B00B4BC8B /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
+		43F4BF221299E97B00B4BC8B /* ofxMatrix3x3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMatrix3x3.cpp; sourceTree = "<group>"; };
+		43F4BF231299E97B00B4BC8B /* ofxMatrix3x3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMatrix3x3.h; sourceTree = "<group>"; };
+		43F4BF241299E97B00B4BC8B /* ofxMatrix4x4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMatrix4x4.cpp; sourceTree = "<group>"; };
+		43F4BF251299E97B00B4BC8B /* ofxMatrix4x4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMatrix4x4.h; sourceTree = "<group>"; };
+		43F4BF261299E97B00B4BC8B /* ofxPoint2f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint2f.h; sourceTree = "<group>"; };
+		43F4BF271299E97B00B4BC8B /* ofxPoint3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint3f.h; sourceTree = "<group>"; };
+		43F4BF281299E97B00B4BC8B /* ofxPoint4f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint4f.h; sourceTree = "<group>"; };
+		43F4BF291299E97B00B4BC8B /* ofxQuaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxQuaternion.cpp; sourceTree = "<group>"; };
+		43F4BF2A1299E97B00B4BC8B /* ofxQuaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxQuaternion.h; sourceTree = "<group>"; };
+		43F4BF2B1299E97B00B4BC8B /* ofxVec2f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec2f.h; sourceTree = "<group>"; };
+		43F4BF2C1299E97B00B4BC8B /* ofxVec3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec3f.h; sourceTree = "<group>"; };
+		43F4BF2D1299E97B00B4BC8B /* ofxVec4f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec4f.h; sourceTree = "<group>"; };
+		43F4BF2E1299E97B00B4BC8B /* ofxVectorMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVectorMath.h; sourceTree = "<group>"; };
 		E446664F0F5B3E03005D0BF0 /* cv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cv.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/cv.h; sourceTree = SOURCE_ROOT; };
 		E44666500F5B3E03005D0BF0 /* cv.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cv.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/cv.hpp; sourceTree = SOURCE_ROOT; };
 		E44666510F5B3E03005D0BF0 /* cvaux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cvaux.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/cvaux.h; sourceTree = SOURCE_ROOT; };
@@ -194,9 +211,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		43F4BF1F1299E97B00B4BC8B /* ofxVectorMath */ = {
+			isa = PBXGroup;
+			children = (
+				43F4BF201299E97B00B4BC8B /* install.xml */,
+				43F4BF211299E97B00B4BC8B /* src */,
+			);
+			path = ofxVectorMath;
+			sourceTree = "<group>";
+		};
+		43F4BF211299E97B00B4BC8B /* src */ = {
+			isa = PBXGroup;
+			children = (
+				43F4BF221299E97B00B4BC8B /* ofxMatrix3x3.cpp */,
+				43F4BF231299E97B00B4BC8B /* ofxMatrix3x3.h */,
+				43F4BF241299E97B00B4BC8B /* ofxMatrix4x4.cpp */,
+				43F4BF251299E97B00B4BC8B /* ofxMatrix4x4.h */,
+				43F4BF261299E97B00B4BC8B /* ofxPoint2f.h */,
+				43F4BF271299E97B00B4BC8B /* ofxPoint3f.h */,
+				43F4BF281299E97B00B4BC8B /* ofxPoint4f.h */,
+				43F4BF291299E97B00B4BC8B /* ofxQuaternion.cpp */,
+				43F4BF2A1299E97B00B4BC8B /* ofxQuaternion.h */,
+				43F4BF2B1299E97B00B4BC8B /* ofxVec2f.h */,
+				43F4BF2C1299E97B00B4BC8B /* ofxVec3f.h */,
+				43F4BF2D1299E97B00B4BC8B /* ofxVec4f.h */,
+				43F4BF2E1299E97B00B4BC8B /* ofxVectorMath.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		E44665C70F5B3E03005D0BF0 /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				43F4BF1F1299E97B00B4BC8B /* ofxVectorMath */,
 				E446663B0F5B3E03005D0BF0 /* ofxOpenCv */,
 			);
 			name = addons;
@@ -665,6 +712,9 @@
 				E446675A0F5B3E04005D0BF0 /* ofxCvGrayscaleImage.cpp in Sources */,
 				E446675B0F5B3E04005D0BF0 /* ofxCvImage.cpp in Sources */,
 				E446675C0F5B3E04005D0BF0 /* ofxCvShortImage.cpp in Sources */,
+				43F4BF2F1299E97B00B4BC8B /* ofxMatrix3x3.cpp in Sources */,
+				43F4BF301299E97B00B4BC8B /* ofxMatrix4x4.cpp in Sources */,
+				43F4BF311299E97B00B4BC8B /* ofxQuaternion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
