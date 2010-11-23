@@ -143,10 +143,22 @@ function actOnScreen(tag, id){
             params.predicate = "AUTHOR";
           }
           anymeta.post("anymeta.edge.add", params).then(function(response){
-            console.log("Added edge");
-            console.dir(response);
-            exports.post("anymeta.thing.update", { thing_id: response.thg_id, "data[pubstate]": 1 }).then(function(){
-              console.log("Published!");
+            var finishedAdding = true;
+            if(id == "made"){
+              var params = {
+                id: response.thg_id,
+                object: user.rsc_id,
+                predicate: "ACTOR"
+              };
+              finishedAdding = anymeta.post("anymeta.edge.add", params);
+            }
+            
+            when(finishedAdding, function(){
+              console.log("Added edges");
+              console.dir(response);
+              anymeta.post("anymeta.thing.update", { thing_id: response.thg_id, "data[pubstate]": 1 }).then(function(){
+                console.log("Published!");
+              });
             });
           });
         });
