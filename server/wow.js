@@ -145,6 +145,9 @@ function actOnScreen(tag, id){
           anymeta.post("anymeta.edge.add", params).then(function(response){
             console.log("Added edge");
             console.dir(response);
+            exports.post("anymeta.thing.update", { thing_id: response.thg_id, "data[pubstate]": 1 }).then(function(){
+              console.log("Published!");
+            });
           });
         });
       },
