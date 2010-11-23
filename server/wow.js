@@ -158,6 +158,7 @@ function clearScreen(){
   applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 49', function(){});
 }
 
+var idle = false;
 var net = require("net");
 net.Server(function(stream){
   stream.setEncoding("utf8");
@@ -165,14 +166,24 @@ net.Server(function(stream){
     var msg = { type: "statechange" };
     if(data.indexOf("active") == 0){
       msg.state = "active";
+      idle = false;
     }
     if(data.indexOf("idle") == 0){
       msg.state = "idle";
+      idle = Date.now();
     }
     msg = JSON.stringify(msg);
     clients.forEach(function(client){
       client.send(msg);
     });
+    setTimeout(function(){
+      if(idle && Date.now() - idle >= 5 * 60 * 1000){
+        var msg = JSON.stringify({ type: "clear" });
+        clients.forEach(function(client){
+          client.send(msg);
+        });
+      }
+    }, 5 * 60 * 1000);
   });
   stream.on("end", function(){
     stream.end();
