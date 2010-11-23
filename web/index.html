@@ -88,6 +88,7 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
 });
 
 var tags = {};
+var unregistered = { like: "Register your tag to like this", made: "Register your tag to take credit", clear: "Somebody cleared the screen!" };
 var labels = { like: "liked this", made: "made this", clear: "cleared the screen!" };
 var grids = { like: "g12", made: "g11", clear: "g10" };
 
@@ -103,10 +104,11 @@ socket.on("message", function(msg){
   if(msg.type == "tag" && msg.state == "add"){
     var tag = tags[msg.data] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }).then(function(response){
       return tags[msg.data] = response;
-    });
+    }, function(){ return false; });
     dojo.when(tag, function(thing){
+      var title = thing ? thing.title + " " + labels[msg.id] : unregistered[msg.id];
       var rendered = dojo.create("p", {
-        innerHTML: thing.title + " " + labels[msg.id],
+        innerHTML: title,
         style: {
           opacity: 0,
           height: 0
