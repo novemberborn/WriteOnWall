@@ -157,3 +157,24 @@ function actOnScreen(tag, id){
 function clearScreen(){
   applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 49', function(){});
 }
+
+var net = require("net");
+net.Server(function(stream){
+  stream.setEncoding("utf8");
+  stream.on("data", function(data){
+    var msg = { type: "statechange" };
+    if(data.indexOf("active") == 0){
+      msg.state = "active";
+    }
+    if(data.indexOf("idle") == 0){
+      msg.state = "idle";
+    }
+    msg = JSON.stringify(msg);
+    clients.forEach(function(client){
+      client.send(msg);
+    });
+  });
+  stream.on("end", function(){
+    stream.end();
+  });
+}).listen(8081, "0.0.0.0");

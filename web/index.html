@@ -93,6 +93,7 @@ var unregistered = { like: "Register your tag to like&nbsp;this", made: "Registe
 var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;screen!" };
 var grids = { like: "g12", made: "g11", clear: "g10" };
 var outstandingAnims = [];
+var idle = false;
 
 var socket = new io.Socket(null, { transports: ["websocket"] });
 setTimeout(function(){ socket.connect(); }, 2000);
@@ -145,6 +146,40 @@ socket.on("message", function(msg){
       }, 8000);
       outstandingAnims.push(removeAnim);    
     });
+  }
+  
+  if(msg.type == "statechange"){
+    if(msg.state == "active"){
+      idle = false;
+    }else{
+      idle = true;
+      showIdle();
+      
+      function showIdle(){
+        var rendered = dojo.create("p", {
+          innerHTML: "Use a bright light to draw!",
+          style: {
+            opacity: 0,
+            height: 0
+          }
+        }, grids.made, "first");
+
+        dojo.fx.chain([
+          dojo.fx.wipeIn({ node: rendered }),
+          dojo.fadeIn({ node: rendered, start: 0, duration: 1000 })
+        ]).play();
+        dojo.fadeOut({
+          node: rendered,
+          start: 1,
+          end: 0,
+          duration: 1000,
+          onEnd: function(){
+            dojo.destroy(rendered);
+            if(idle){ showIdle(); }
+          }
+        }).play(8000);
+      }
+    }
   }
 });
 </script>
