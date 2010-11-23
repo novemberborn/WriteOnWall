@@ -178,7 +178,7 @@ net.Server(function(stream){
     });
     setTimeout(function(){
       if(idle && Date.now() - idle >= 5 * 60 * 1000){
-        var msg = JSON.stringify({ type: "clear" });
+        var msg = JSON.stringify({ type: "requestClear" });
         clients.forEach(function(client){
           client.send(msg);
         });

@@ -94,10 +94,12 @@ var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared 
 var grids = { like: "g12", made: "g11", clear: "g10" };
 var outstandingAnims = [];
 var idle = false;
+var interesting = false;
 
 function clearScreen(){
   dojo.fx.combine(outstandingAnims).play();
   outstandingAnims = [];
+  interesting = false;
 }
 
 function showIdle(){
@@ -173,8 +175,12 @@ socket.on("message", function(msg){
           outstandingAnims.splice(ix, 1);
         }
       }, 8000);
-      outstandingAnims.push(removeAnim);    
+      outstandingAnims.push(removeAnim);
     });
+    
+    if(msg.id == "like" || msg.id == "made"){
+      interesting = true;
+    }
   }
   
   if(msg.type == "statechange"){
@@ -186,8 +192,8 @@ socket.on("message", function(msg){
     }
   }
   
-  if(msg.type == "clear"){
-    clearScreen();
+  if(msg.type == "requestClear"){
+    !interesting && clearScreen();
   }
 });
 </script>
