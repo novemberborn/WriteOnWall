@@ -41,7 +41,7 @@ void testApp::setup(){
 	improvedBrushImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 
 	bLearnBackground = true;
-	threshold = 80;
+	threshold = 130;
 	
 	// Quad Warping
 	screenSourcePoints[0].set(0.0, 0.0);
@@ -53,14 +53,14 @@ void testApp::setup(){
 	// TODO get these from an XML file
 	
 	// Default values:
-	quadAx = 20;
-	quadAy = 20;
-	quadBx = 600;
-	quadBy = 40;
-	quadCx = -40;
-	quadCy = 400;
-	quadDx = 500;
-	quadDy = 550;
+	quadAx = -14;
+	quadAy = 21;
+	quadBx = 645;
+	quadBy = 21;
+	quadCx = 7;
+	quadCy = 504;
+	quadDx = 629;
+	quadDy = 506;
 	
 	selectedQuadPoint = 0;
 	selectQuadx = NULL;
@@ -71,6 +71,19 @@ void testApp::setup(){
 	screenDestPoints[2].set(quadCx, quadCy);
 	screenDestPoints[3].set(quadDx, quadDy);
 	
+	// Idle State Checking
+	bPreIdleState = false;
+	bIdleState = false;
+	
+
+	//are we connected to the server - if this fails we
+	//will check every few seconds to see if the server exists
+	weConnected = tcpClient.setup("127.0.0.1", 11999);
+	
+	connectTime = 0;
+	deltaTime = 0;
+	
+	tcpClient.setVerbose(true);
 }
 
 //--------------------------------------------------------------
@@ -181,8 +194,61 @@ void testApp::update(){
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
 		contourFinder.findContours(grayDiff, 20, (_CAM_WIDTH * _CAM_HEIGHT)/3, 10, true);	// find holes
-	}
+		
+		// Idle State Checking
+		
+		if ((bPreIdleState || bIdleState) && (contourFinder.nBlobs > 1)) {
+			bPreIdleState = false;
+			bIdleState = false;
+			sendIdleMessage(false);
+		}
+		
+		if (bPreIdleState) {
+			int millisSinceBeginIdle = ofGetSystemTime() - millisBeginIdle;
+			if (millisSinceBeginIdle > _IDLE_KICKIN_TRESHOLD_MILLIS) {
+				bIdleState = true;
+				bPreIdleState = false;
+				sendIdleMessage(true);
+			}
+			
+		}
+		
+		if ((!bPreIdleState && !bIdleState) && (contourFinder.nBlobs == 0)) {
+			bPreIdleState = true;
+			millisBeginIdle = ofGetSystemTime();
+		}
 
+	}
+	
+	// TCP SOCKET
+	if (!weConnected) {
+		//if we are not connected lets try and reconnect every 5 seconds
+		deltaTime = ofGetElapsedTimeMillis() - connectTime;
+		
+		if ( deltaTime > 5000 ) {
+			weConnected = tcpClient.setup("127.0.0.1", 8081);
+			//weConnected = tcpClient.setup("10.0.1.33", 8081);
+			connectTime = ofGetElapsedTimeMillis();
+		}
+		
+	}
+	
+
+}
+
+
+void testApp::sendIdleMessage(bool isIdle) {
+	if (isIdle) {
+		cout << "WE SHOULD SEND A IDLE MESSAGE\n";
+		if ( weConnected ) {
+			tcpClient.send("idle");
+		}
+	} else {
+		cout << "CANCEL THE IDLE MESSAGE\n";
+		if ( weConnected ) {
+			tcpClient.send("active");
+		}
+	}
 }
 
 //--------------------------------------------------------------

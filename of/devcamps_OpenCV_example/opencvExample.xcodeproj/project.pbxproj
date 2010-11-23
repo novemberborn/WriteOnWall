@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		430E3AC7129B57C9000DB2C3 /* ofxTCPClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 430E3AB8129B57C9000DB2C3 /* ofxTCPClient.cpp */; };
+		430E3AC8129B57C9000DB2C3 /* ofxTCPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 430E3ABA129B57C9000DB2C3 /* ofxTCPManager.cpp */; };
+		430E3AC9129B57C9000DB2C3 /* ofxTCPServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 430E3ABC129B57C9000DB2C3 /* ofxTCPServer.cpp */; };
+		430E3ACA129B57C9000DB2C3 /* ofxUDPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 430E3ABE129B57C9000DB2C3 /* ofxUDPManager.cpp */; };
+		430E3ACB129B57C9000DB2C3 /* ofxThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 430E3AC5129B57C9000DB2C3 /* ofxThread.cpp */; };
 		43F4BF2F1299E97B00B4BC8B /* ofxMatrix3x3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF221299E97B00B4BC8B /* ofxMatrix3x3.cpp */; };
 		43F4BF301299E97B00B4BC8B /* ofxMatrix4x4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF241299E97B00B4BC8B /* ofxMatrix4x4.cpp */; };
 		43F4BF311299E97B00B4BC8B /* ofxQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BF291299E97B00B4BC8B /* ofxQuaternion.cpp */; };
@@ -88,6 +93,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		430E3AB4129B57C9000DB2C3 /* Instructions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Instructions.txt; sourceTree = "<group>"; };
+		430E3AB5129B57C9000DB2C3 /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
+		430E3AB7129B57C9000DB2C3 /* ofxNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNetwork.h; sourceTree = "<group>"; };
+		430E3AB8129B57C9000DB2C3 /* ofxTCPClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTCPClient.cpp; sourceTree = "<group>"; };
+		430E3AB9129B57C9000DB2C3 /* ofxTCPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTCPClient.h; sourceTree = "<group>"; };
+		430E3ABA129B57C9000DB2C3 /* ofxTCPManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTCPManager.cpp; sourceTree = "<group>"; };
+		430E3ABB129B57C9000DB2C3 /* ofxTCPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTCPManager.h; sourceTree = "<group>"; };
+		430E3ABC129B57C9000DB2C3 /* ofxTCPServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTCPServer.cpp; sourceTree = "<group>"; };
+		430E3ABD129B57C9000DB2C3 /* ofxTCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTCPServer.h; sourceTree = "<group>"; };
+		430E3ABE129B57C9000DB2C3 /* ofxUDPManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxUDPManager.cpp; sourceTree = "<group>"; };
+		430E3ABF129B57C9000DB2C3 /* ofxUDPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxUDPManager.h; sourceTree = "<group>"; };
+		430E3AC2129B57C9000DB2C3 /* Instructions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Instructions.txt; sourceTree = "<group>"; };
+		430E3AC3129B57C9000DB2C3 /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
+		430E3AC5129B57C9000DB2C3 /* ofxThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxThread.cpp; sourceTree = "<group>"; };
+		430E3AC6129B57C9000DB2C3 /* ofxThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxThread.h; sourceTree = "<group>"; };
 		43F4BF201299E97B00B4BC8B /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
 		43F4BF221299E97B00B4BC8B /* ofxMatrix3x3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMatrix3x3.cpp; sourceTree = "<group>"; };
 		43F4BF231299E97B00B4BC8B /* ofxMatrix3x3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMatrix3x3.h; sourceTree = "<group>"; };
@@ -211,6 +231,67 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		430E3AB2129B57C9000DB2C3 /* ofxNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AB3129B57C9000DB2C3 /* docs */,
+				430E3AB5129B57C9000DB2C3 /* install.xml */,
+				430E3AB6129B57C9000DB2C3 /* src */,
+			);
+			path = ofxNetwork;
+			sourceTree = "<group>";
+		};
+		430E3AB3129B57C9000DB2C3 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AB4129B57C9000DB2C3 /* Instructions.txt */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		430E3AB6129B57C9000DB2C3 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AB7129B57C9000DB2C3 /* ofxNetwork.h */,
+				430E3AB8129B57C9000DB2C3 /* ofxTCPClient.cpp */,
+				430E3AB9129B57C9000DB2C3 /* ofxTCPClient.h */,
+				430E3ABA129B57C9000DB2C3 /* ofxTCPManager.cpp */,
+				430E3ABB129B57C9000DB2C3 /* ofxTCPManager.h */,
+				430E3ABC129B57C9000DB2C3 /* ofxTCPServer.cpp */,
+				430E3ABD129B57C9000DB2C3 /* ofxTCPServer.h */,
+				430E3ABE129B57C9000DB2C3 /* ofxUDPManager.cpp */,
+				430E3ABF129B57C9000DB2C3 /* ofxUDPManager.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		430E3AC0129B57C9000DB2C3 /* ofxThread */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AC1129B57C9000DB2C3 /* docs */,
+				430E3AC3129B57C9000DB2C3 /* install.xml */,
+				430E3AC4129B57C9000DB2C3 /* src */,
+			);
+			path = ofxThread;
+			sourceTree = "<group>";
+		};
+		430E3AC1129B57C9000DB2C3 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AC2129B57C9000DB2C3 /* Instructions.txt */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		430E3AC4129B57C9000DB2C3 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				430E3AC5129B57C9000DB2C3 /* ofxThread.cpp */,
+				430E3AC6129B57C9000DB2C3 /* ofxThread.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		43F4BF1F1299E97B00B4BC8B /* ofxVectorMath */ = {
 			isa = PBXGroup;
 			children = (
@@ -245,6 +326,8 @@
 			children = (
 				43F4BF1F1299E97B00B4BC8B /* ofxVectorMath */,
 				E446663B0F5B3E03005D0BF0 /* ofxOpenCv */,
+				430E3AB2129B57C9000DB2C3 /* ofxNetwork */,
+				430E3AC0129B57C9000DB2C3 /* ofxThread */,
 			);
 			name = addons;
 			path = ../../../addons;
@@ -715,6 +798,11 @@
 				43F4BF2F1299E97B00B4BC8B /* ofxMatrix3x3.cpp in Sources */,
 				43F4BF301299E97B00B4BC8B /* ofxMatrix4x4.cpp in Sources */,
 				43F4BF311299E97B00B4BC8B /* ofxQuaternion.cpp in Sources */,
+				430E3AC7129B57C9000DB2C3 /* ofxTCPClient.cpp in Sources */,
+				430E3AC8129B57C9000DB2C3 /* ofxTCPManager.cpp in Sources */,
+				430E3AC9129B57C9000DB2C3 /* ofxTCPServer.cpp in Sources */,
+				430E3ACA129B57C9000DB2C3 /* ofxUDPManager.cpp in Sources */,
+				430E3ACB129B57C9000DB2C3 /* ofxThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

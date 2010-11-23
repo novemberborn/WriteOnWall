@@ -5,6 +5,10 @@
 
 #include "ofxOpenCv.h"
 #include "ofxVectorMath.h"
+#include "ofxNetwork.h"
+
+#define RECONNECT_TIME 400
+
 
 #define _USE_LIVE_VIDEO		// uncomment this to use a live camera
 								// otherwise, we'll use a movie file
@@ -24,6 +28,9 @@
 #define _SCREEN_HEIGHT 768
 #define _SCREEN_OFFSET_X 1024
 #define _SCREEN_OFFSET_Y 0
+
+
+#define _IDLE_KICKIN_TRESHOLD_MILLIS 6000
 
 class testApp : public ofBaseApp{
 
@@ -95,6 +102,23 @@ class testApp : public ofBaseApp{
 	int selectedQuadPoint;
 	int *selectQuadx;
 	int *selectQuady;
+	
+	bool bIdleState;
+	bool bPreIdleState;
+	int millisBeginIdle;
+	
+	
+	ofxTCPClient tcpClient;
+	bool weConnected;
+	int connectTime;
+	int deltaTime;
+
+
+
+	
+	
+private:
+	void sendIdleMessage(bool isIdle);
 
 };
 
