@@ -22,7 +22,7 @@ var fileServer = new static.Server("../web", { cache: 0 });
 var httpServer = http.Server(function(req, res){
   var info = url.parse(req.url, true);
   
-  console.log(req.url);
+  // console.log(req.url);
   if(info.pathname.indexOf("/tag") == 0){
     var tag = "";
     var id = info.pathname.split(/\//).pop();
