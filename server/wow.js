@@ -133,13 +133,15 @@ function actOnScreen(tag, id){
         
         when(attachment, function(response){
           console.log("Adding edge…");
-          var params = {
-            id: response.thg_id,
-            object: user.rsc_id
-          };
+          var params = {};
           if(id == "like"){
-            params.predicate = "ACTOR";
+            params.id = user.rsc_id;
+            params.object = response.thg_id;
+            params.modifier_id = user.rsc_id;
+            params.predicate = "INTEREST";
           }else{
+            params.id = response.thg_id;
+            params.object = user.rsc_id;
             params.predicate = "AUTHOR";
           }
           anymeta.post("anymeta.edge.add", params).then(function(response){
