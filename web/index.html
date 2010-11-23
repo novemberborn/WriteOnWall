@@ -88,8 +88,8 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
 });
 
 var tags = {};
-var unregistered = { like: "Register your tag to like this", made: "Register your tag to take credit", clear: "Somebody cleared the screen!" };
-var labels = { like: "liked this", made: "made this", clear: "cleared the screen!" };
+var unregistered = { like: "Register your tag to like&nbsp;this", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;screen!" };
+var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;screen!" };
 var grids = { like: "g12", made: "g11", clear: "g10" };
 
 var socket = new io.Socket(null, { transports: ["websocket"] });
