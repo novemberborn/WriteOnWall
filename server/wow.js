@@ -123,7 +123,8 @@ function actOnScreen(tag, id){
         if(!attachment){
           attachment = img.attachment = anymeta.post("anymeta.attachment.create", {
             data: img.toString("base64"),
-            mime: "image/png"
+            mime: "image/png",
+            title: "Wow! Painting at " + new Date().toTimeString().split(":").slice(0,2).join(":")
           }).then(function(response){
             console.log("Uploaded image");
             // console.dir(response);
@@ -132,34 +133,34 @@ function actOnScreen(tag, id){
         }
         
         when(attachment, function(response){
-          console.log("Adding edge…");
-          var params = {};
-          if(id == "like"){
-            params.id = user.rsc_id;
-            params.object = response.thg_id;
-            params.modifier_id = user.rsc_id;
-            params.predicate = "INTEREST";
-          }else{
-            params.id = response.thg_id;
-            params.object = user.rsc_id;
-            params.predicate = "AUTHOR";
+          console.log("Adding AUTHOR");
+          var thingId = response.thg_id;
+          var authorEdge = true;
+          if(id == "made"){
+            authorEdge = anymeta.post("anymeta.edge.add", {
+              id: thingId,
+              object: user.rsc_id,
+              predicate: "AUTHOR"
+            });
           }
-          anymeta.post("anymeta.edge.add", params).then(function(response){
-            var finishedAdding = true;
-            if(id == "made"){
-              var params = {
-                id: response.thg_id,
-                object: user.rsc_id,
-                predicate: "ACTOR"
-              };
-              finishedAdding = anymeta.post("anymeta.edge.add", params);
-            }
-            
-            when(finishedAdding, function(){
-              console.log("Added edges");
-              console.dir(response);
-              anymeta.post("anymeta.thing.update", { thing_id: response.thg_id, "data[pubstate]": 1 }).then(function(){
-                console.log("Published!");
+          
+          when(authorEdge, function(){
+            console.log("Publishing");
+            anymeta.post("anymeta.thing.update", { thing_id: thingId, "data[pubstate]": 1 }).then(function(){
+              var params = {};
+              if(id == "like"){
+                params.id = user.rsc_id;
+                params.object = thingId;
+                params.modifier_id = user.rsc_id;
+                params.predicate = "INTEREST";
+              }else{
+                params.id = thingId;
+                params.object = user.rsc_id;
+                params.predicate = "ACTOR";
+              }
+              console.log("Adding INTEREST or ACTOR");
+              anymeta.post("anymeta.edge.add", params).then(function(){
+                console.log("Completed");
               });
             });
           });
