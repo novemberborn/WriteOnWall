@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="21"/>
 			<integer value="57"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
@@ -49,15 +49,15 @@
 			<object class="NSWindowTemplate" id="259226951">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{0, 0}, {1024, 768}}</string>
+				<string key="NSWindowRect">{{1455, -22}, {1596, 768}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">WebViewWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
 				</object>
-				<string key="NSWindowContentMaxSize">{1024, 768}</string>
-				<string key="NSWindowContentMinSize">{1024, 768}</string>
+				<string key="NSWindowContentMaxSize">{1596, 768}</string>
+				<string key="NSWindowContentMinSize">{1596, 768}</string>
 				<object class="NSView" key="NSWindowView" id="503972351">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -87,7 +87,7 @@
 									<string>public.url-name</string>
 								</object>
 							</object>
-							<string key="NSFrameSize">{1024, 768}</string>
+							<string key="NSFrame">{{45, 0}, {1546, 768}}</string>
 							<reference key="NSSuperview" ref="503972351"/>
 							<reference key="NSNextKeyView"/>
 							<string key="FrameName"/>
@@ -114,12 +114,12 @@
 							<bool key="AllowsUndo">YES</bool>
 						</object>
 					</object>
-					<string key="NSFrameSize">{1024, 768}</string>
+					<string key="NSFrameSize">{1596, 768}</string>
 					<reference key="NSSuperview"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1024, 746}}</string>
-				<string key="NSMinSize">{1024, 790}</string>
-				<string key="NSMaxSize">{1024, 790}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSMinSize">{1596, 790}</string>
+				<string key="NSMaxSize">{1596, 790}</string>
 			</object>
 			<object class="NSMenu" id="233829233">
 				<string key="NSTitle">MainMenu</string>
@@ -1467,15 +1467,15 @@
 					<string>TransparentWebView</string>
 					<string>com.apple.WebKitIBPlugin</string>
 					<boolean value="YES"/>
-					<string>{{170, 4}, {1024, 752}}</string>
+					<string>{{1455, -22}, {1596, 768}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{170, 4}, {1024, 752}}</string>
+					<string>{{1455, -22}, {1596, 768}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
-					<string>{1024, 768}</string>
-					<string>{1024, 768}</string>
+					<string>{1596, 768}</string>
+					<string>{1596, 768}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1539,6 +1539,7 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
 					<string key="className">FirstResponder</string>
+					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>

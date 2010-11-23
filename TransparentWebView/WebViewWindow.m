@@ -9,7 +9,7 @@
 		defer:(BOOL)flag 
 {
 	if(self = [super initWithContentRect:contentRect
-						styleMask:NSBorderlessWindowMask 
+						styleMask:aStyle//NSBorderlessWindowMask 
 						backing:bufferingType 
 						defer:flag]){        
 		[self setBackgroundColor: [NSColor clearColor]];
