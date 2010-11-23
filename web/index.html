@@ -63,6 +63,12 @@ html, body {
   background: #E20074;
 }
 
+#bottom img {
+  padding: 0 74px;
+  width: 200px;
+  background: #FFF;
+}
+
 .left {
   left: 0;
 }
@@ -105,10 +111,11 @@ function clearScreen(){
 
 function showIdle(){
   var rendered = dojo.create("p", {
-    innerHTML: "Use a bright light to write!",
+    innerHTML: '<img src="/WOW_2.png" width="200px"><br>Use a bright light to write!',
     style: {
       opacity: 0,
-      height: 0
+      height: 0,
+      paddingTop: "24px"
     }
   }, grids.made, "first");
 
