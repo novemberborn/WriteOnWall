@@ -46,7 +46,7 @@ html, body {
   top: 0;
   width: 486px;
   height: 100%;
-  padding: 1em;
+  padding: 48px;
   -webkit-box-sizing: border-box;
   -webkit-transform: rotateY(180deg) rotateX(180deg);
 }
@@ -54,7 +54,7 @@ html, body {
 #top > * > *, #bottom > * > * {
   -webkit-transform: rotateX(180deg);
   display: block;
-  padding: 0 0 0 .5em;
+  padding: 0 0 0 24px;
   margin-top: 0;
   overflow: hidden;
 }
@@ -208,7 +208,7 @@ socket.on("message", function(msg){
   if(msg.type == "statechange"){
     if(msg.state == "active"){
       idle = false;
-    }else{
+    }else if(!idle){
       idle = true;
       showIdle();
     }
