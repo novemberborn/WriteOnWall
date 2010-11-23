@@ -55,6 +55,7 @@ html, body {
   display: block;
   padding: 0 0 0 .5em;
   margin-top: 0;
+  overflow: hidden;
 }
 
 #bottom > * > * {
@@ -89,8 +90,9 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
 
 var tags = {};
 var unregistered = { like: "Register your tag to like&nbsp;this", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;screen!" };
-var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;screen!" };
+var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;screen!" };
 var grids = { like: "g12", made: "g11", clear: "g10" };
+var outstandingAnims = [];
 
 var socket = new io.Socket(null, { transports: ["websocket"] });
 setTimeout(function(){ socket.connect(); }, 2000);
@@ -119,7 +121,7 @@ socket.on("message", function(msg){
         dojo.fx.wipeIn({ node: rendered }),
         dojo.fadeIn({ node: rendered, start: 0, duration: 1000 })
       ]).play();
-      dojo.fadeOut({
+      var removeAnim = dojo.fadeOut({
         node: rendered,
         start: 1,
         end: 0,
@@ -127,7 +129,21 @@ socket.on("message", function(msg){
         onEnd: function(){
           dojo.destroy(rendered);
         }
-      }).play(8000);
+      });
+      
+      if(msg.id == "clear"){
+        dojo.fx.combine(outstandingAnims).play();
+        outstandingAnims = [];
+      }
+      
+      setTimeout(function(){
+        var ix = dojo.indexOf(outstandingAnims, removeAnim);
+        if(ix != -1){
+          removeAnim.play();
+          outstandingAnims.splice(ix, 1);
+        }
+      }, 8000);
+      outstandingAnims.push(removeAnim);    
     });
   }
 });
