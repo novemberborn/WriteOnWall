@@ -422,6 +422,9 @@ void testApp::keyPressed  (int key){
 #endif
 			outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
 			outputImage.saveImage(createName());
+#ifdef _MIRROR_OUTPUT_IMAGE
+			brushImg.mirror(false, true);
+#endif
 			break;
 		// Use the s key to select the source
 		case 's':
