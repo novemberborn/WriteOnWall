@@ -30,7 +30,7 @@
 #define _SCREEN_OFFSET_Y 0
 
 
-#define _IDLE_KICKIN_TRESHOLD_MILLIS 6000
+#define _IDLE_KICKIN_TRESHOLD_MILLIS 60000
 
 class testApp : public ofBaseApp{
 
