@@ -89,8 +89,8 @@ dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
 });
 
 var tags = {};
-var unregistered = { like: "Register your tag to like&nbsp;this", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;screen!" };
-var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;screen!" };
+var unregistered = { like: "Register your tag to like&nbsp;this", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;wall!" };
+var labels = { like: "liked&nbsp;this", made: "made&nbsp;this", clear: "cleared the&nbsp;wall!" };
 var grids = { like: "g12", made: "g11", clear: "g10" };
 var outstandingAnims = [];
 var idle = false;
@@ -104,7 +104,7 @@ function clearScreen(){
 
 function showIdle(){
   var rendered = dojo.create("p", {
-    innerHTML: "Use a bright light to draw!",
+    innerHTML: "Use a bright light to write!",
     style: {
       opacity: 0,
       height: 0
