@@ -99,7 +99,7 @@ function identifyUser(tag){
 }
 
 var lastScreen;
-var USE_LAST_FOR = 5000;
+var USE_LAST_FOR = 10000;
 function actOnScreen(tag, id){
   var user = identifyUser(tag);
   var screen;
