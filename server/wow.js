@@ -77,7 +77,7 @@ function saveScreen(){
   }
   
   var dfd = defer();
-  applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 36', function(){});
+  applescript.execString('activate application "opencvExample"\ntell application "System Events" to key code 36', function(){});
   outputQueue.push(dfd);
   return dfd.promise;
 }
@@ -95,6 +95,8 @@ var tags = {};
 function identifyUser(tag){
   return tags[tag] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + tag }).then(function(user){
     return tags[tag] = user;
+  }, function(){
+    return null;
   });
 }
 
@@ -116,6 +118,7 @@ function actOnScreen(tag, id){
   }
   when(screen, function(img){
     when(user, function(user){
+        if(!user){ return; }
         console.log("Identified user for tag %s", tag);
         // console.dir(user);
         
@@ -129,10 +132,11 @@ function actOnScreen(tag, id){
             console.log("Uploaded image");
             // console.dir(response);
             return response;
-          });
+          }, function(){ return null; });
         }
         
         when(attachment, function(response){
+          if(!response){ return; }
           console.log("Adding AUTHOR");
           var thingId = response.thg_id;
           var authorEdge = true;
@@ -141,10 +145,13 @@ function actOnScreen(tag, id){
               id: thingId,
               object: user.rsc_id,
               predicate: "AUTHOR"
+            }, function(){
+              return null;
             });
           }
           
-          when(authorEdge, function(){
+          when(authorEdge, function(authorEdgeResponse){
+            if(!authorEdgeResponse){ return null; }
             console.log("Publishing");
             anymeta.post("anymeta.thing.update", { thing_id: thingId, "data[pubstate]": 1 }).then(function(){
               var params = {};
@@ -161,8 +168,14 @@ function actOnScreen(tag, id){
               console.log("Adding INTEREST or ACTOR");
               anymeta.post("anymeta.edge.add", params).then(function(){
                 console.log("Completed");
+              }, function(){
+                return null;
               });
+            }, function(){
+              return null;
             });
+          }, function(){
+            return null;
           });
         });
       },
@@ -173,7 +186,7 @@ function actOnScreen(tag, id){
 }
 
 function clearScreen(){
-  applescript.execString('activate application "opencvExampleDebug"\ntell application "System Events" to key code 49', function(){});
+  applescript.execString('activate application "opencvExample"\ntell application "System Events" to key code 49', function(){});
 }
 
 var idle = false;
