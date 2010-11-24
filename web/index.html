@@ -110,9 +110,10 @@ function clearScreen(){
 }
 
 var idleLikeGrid = true;
+var lastIdleNodes = [];
 function showIdle(){
-  var rendered = [];
-  rendered.push(dojo.create("p", {
+  lastIdleNodes = [];
+  lastIdleNodes.push(dojo.create("p", {
     innerHTML: '<img src="/WOW_2.png" width="200px"><br>Use a bright light to write!',
     style: {
       opacity: 0,
@@ -127,7 +128,7 @@ function showIdle(){
   }else{
     title = "Write on this wall with a light source";
   }
-  rendered.push(dojo.create("p", {
+  lastIdleNodes.push(dojo.create("p", {
     innerHTML: title,
     style: {
       opacity: 0,
@@ -136,14 +137,14 @@ function showIdle(){
   }, idleLikeGrid ? grids.like : grids.clear, "first"));
   
   idleLikeGrid = !idleLikeGrid;
-  dojo.fx.combine(rendered.reduce(function(anims, rendered){
+  dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
     anims.push(dojo.fx.chain([
       dojo.fx.wipeIn({ node: rendered }),
       dojo.fadeIn({ node: rendered, start: 0, duration: 1000 })
     ]));
     return anims;
   }, [])).play();
-  var combined = dojo.fx.combine(rendered.reduce(function(anims, rendered){
+  var combined = dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
     anims.push(
       dojo.fadeOut({
         node: rendered,
@@ -155,10 +156,29 @@ function showIdle(){
     return anims;
   }, []));
   dojo.connect(combined, "onEnd", function(){
-    dojo.destroy(rendered);
+    lastIdleNodes.forEach(function(rendered){ dojo.destroy(rendered); });
     if(idle){ showIdle(); }
   });
   combined.play(8000);
+}
+
+function hideIdle(){
+  var combined = dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
+    anims.push(
+      dojo.fadeOut({
+        node: rendered,
+        start: 1,
+        end: 0,
+        duration: 1000
+      })
+    );
+    return anims;
+  }, []));
+  dojo.connect(combined, "onEnd", function(){
+    lastIdleNodes.forEach(function(rendered){ dojo.destroy(rendered); });
+    if(idle){ showIdle(); }
+  });
+  combined.play();
 }
 
 var socket = new io.Socket(null, { transports: ["websocket"] });
@@ -234,6 +254,7 @@ socket.on("message", function(msg){
   if(msg.type == "statechange"){
     if(msg.state == "active"){
       idle = false;
+      hideIdle();
     }else if(!idle){
       idle = true;
       showIdle();
