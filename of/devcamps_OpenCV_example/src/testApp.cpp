@@ -398,7 +398,7 @@ num blobs found %i, fps: %f", threshold, quadAx, quadAy, quadBx, quadBy,
 
 string createName() {
 	stringstream s1;
-	s1 << "wallimage" << ofGetSystemTime() << ".png";
+	s1 << _SAVE_LOCATION << "wallimage" << ofGetSystemTime() << ".png";
 	return s1.str();
 }
 

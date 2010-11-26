@@ -17,6 +17,7 @@
 
 #define _MIRROR_OUTPUT_IMAGE // uncomment when you're not using rear projection
 
+#define _SAVE_LOCATION "/Users/dirk/Desktop/myData/"
 
 //#define _FULLSCREEN
 
