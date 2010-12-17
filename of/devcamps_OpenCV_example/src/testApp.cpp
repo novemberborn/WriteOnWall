@@ -40,7 +40,7 @@ void testApp::setup(){
 	improvedBrushImg.allocate(_CAM_WIDTH, _CAM_HEIGHT);
 
 	bLearnBackground = true;
-	threshold = 130;
+	threshold = 160;
 	
 	// Quad Warping
 	screenSourcePoints[0].set(0.0, 0.0);
@@ -52,14 +52,14 @@ void testApp::setup(){
 	// TODO get these from an XML file
 	
 	// Default values:
-	quadAx = -14;
-	quadAy = 21;
-	quadBx = 645;
-	quadBy = 21;
-	quadCx = 7;
-	quadCy = 504;
-	quadDx = 629;
-	quadDy = 506;
+	quadAx = -20;
+	quadAy = -26;
+	quadBx = 658;
+	quadBy = -26;
+	quadCx = 15;
+	quadCy = 470;
+	quadDx = 637;
+	quadDy = 465;
 	
 	selectedQuadPoint = 0;
 	selectQuadx = NULL;
