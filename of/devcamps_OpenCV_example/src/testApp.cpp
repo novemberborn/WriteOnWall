@@ -1,6 +1,5 @@
 #include "testApp.h"
 
-
 //--------------------------------------------------------------
 void testApp::setup(){
 
@@ -235,7 +234,21 @@ void testApp::update(){
 	}
 	
 	// TCP SOCKET
-	if (!weConnected) {
+	if (weConnected) {
+		// See if we received some messages
+		string msgRx = tcpClient.receive();
+		if( msgRx.length() > 0 ) {
+			if (msgRx == "clear") {
+				cout << "Received an external call for clearScreen()";
+				clearScreen();
+			}
+			if (msgRx == "capture") {
+				cout << "Received an external call for saveImage()";
+				saveImage();
+			}
+		}
+		
+	} else {
 		//if we are not connected lets try and reconnect every 5 seconds
 		deltaTime = ofGetElapsedTimeMillis() - connectTime;
 		
@@ -246,6 +259,8 @@ void testApp::update(){
 		}
 		
 	}
+	
+	
 	
 	
 	// CALIBRATION MODE
@@ -362,6 +377,38 @@ void testApp::update(){
 		}
 	}
 }
+
+
+
+//----------------------------
+// EXTRA FUNCTIONS 
+
+string createName() {
+	stringstream s1;
+	s1 << _SAVE_LOCATION << "wallimage" << ofGetSystemTime() << ".png";
+	return s1.str();
+}
+
+
+
+void testApp::saveImage() {
+	// SAVE image
+#ifdef _MIRROR_OUTPUT_IMAGE
+	brushImg.mirror(false, true);
+#endif
+	outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
+	outputImage.saveImage(createName());
+#ifdef _MIRROR_OUTPUT_IMAGE
+	brushImg.mirror(false, true);
+#endif
+}
+
+
+
+void testApp::clearScreen() {
+	bClearBackground = true;
+}
+
 
 
 void testApp::sendIdleMessage(bool isIdle) {
@@ -629,12 +676,6 @@ press 'C' to exit calibration mode.", threshold, quadAx, quadAy, quadBx, quadBy,
 }
 
 
-string createName() {
-	stringstream s1;
-	s1 << _SAVE_LOCATION << "wallimage" << ofGetSystemTime() << ".png";
-	return s1.str();
-}
-
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 
@@ -658,19 +699,12 @@ void testApp::keyPressed  (int key){
 			break;
 		// Use the spacebar to clear the image
 		case ' ':
-			bClearBackground = true;
+			clearScreen();
 			break;
 		// Use the enter key to select the source
 		case 13:
 			// SAVE image
-#ifdef _MIRROR_OUTPUT_IMAGE
-			brushImg.mirror(false, true);
-#endif
-			outputImage.setFromPixels(brushImg.getPixels(), brushImg.getWidth(), brushImg.getHeight(), OF_IMAGE_COLOR, true);
-			outputImage.saveImage(createName());
-#ifdef _MIRROR_OUTPUT_IMAGE
-			brushImg.mirror(false, true);
-#endif
+			saveImage();
 			break;
 		// Use the s key to select the source
 		case 's':

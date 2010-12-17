@@ -141,6 +141,8 @@ class testApp : public ofBaseApp{
 	unsigned int		calibratedHistory;			// a long int (32bit) as binary string (0 is bad, 1 is good)
 	
 private:
+	void saveImage();
+	void clearScreen();
 	void sendIdleMessage(bool isIdle);
 
 };
