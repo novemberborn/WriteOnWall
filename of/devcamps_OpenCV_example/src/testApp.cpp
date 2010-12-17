@@ -93,8 +93,8 @@ void testApp::setup(){
 	nCalibrationFailedMininumThreshold = 50; // At least a difference of 255 - 50
 	calibratedThreshold = 0; // 0 means not calibrated yet
 	calibrationCornerSize = 60; // corner blocks of 60 x 60 (measured agains the screen size)
-	calibrationXOffset = 10; // 10 more to the center
-	calibrationYOffset = 100; // 100 more to the center
+	calibrationXOffset = 20; // 10 more to the center
+	calibrationYOffset = 200; // 100 more to the center
 	calibratedHistory = 0;
 }
 
@@ -321,6 +321,9 @@ void testApp::update(){
 				// step 4: draw the corners in white
 				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
 					calibrationPhase ++;
+					// Due to the window bars, threshold calibration is not working @mediamatic
+					calibrationPhase ++; // Skip the fining threshold phase (@Mediamatic)
+					
 					feedbackBeginTime = ofGetElapsedTimeMillis();
 					// step 5: start decreasing threshold
 					calibratedHistory = 0;
