@@ -84,6 +84,19 @@ void testApp::setup(){
 	deltaTime = 0;
 	
 	tcpClient.setVerbose(true);
+	
+	// Calibration Code
+	bCalibrateMode = false;
+	calibrationPhase = 0;
+	mininumFeedbackMillis = 200; // 0.2 seconds
+	feedbackBeginTime = 0;
+	bCalibrationFailedForContrast = false;
+	nCalibrationFailedMininumThreshold = 50; // At least a difference of 255 - 50
+	calibratedThreshold = 0; // 0 means not calibrated yet
+	calibrationCornerSize = 60; // corner blocks of 60 x 60 (measured agains the screen size)
+	calibrationXOffset = 10; // 10 more to the center
+	calibrationYOffset = 100; // 100 more to the center
+	calibratedHistory = 0;
 }
 
 //--------------------------------------------------------------
@@ -191,9 +204,10 @@ void testApp::update(){
 		screenDestPoints[3].set(quadDx, quadDy);
 		
 		
-		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
+		// find contours which are between the size of 10 pixels and 1/2 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
-		contourFinder.findContours(grayDiff, 20, (_CAM_WIDTH * _CAM_HEIGHT)/3, 10, true);	// find holes
+		// and consider not more than 8 blobs (or holes)
+		contourFinder.findContours(grayDiff, 10, (_CAM_WIDTH * _CAM_HEIGHT)/2, 8, true);	// find holes
 		
 		// Idle State Checking
 		
@@ -233,7 +247,120 @@ void testApp::update(){
 		
 	}
 	
-
+	
+	// CALIBRATION MODE
+	if (bCalibrateMode) {
+		
+		switch (calibrationPhase) {
+			case 0:
+				// step 0: draw black
+				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
+					calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 1: take background reference
+					bLearnBackground = true;
+					// reset the warning
+					bCalibrationFailedForContrast = false;
+				} 
+				break;
+			case 1:
+				// step 1: take background reference (keep drawing black)
+				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
+					calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 2: draw white
+					// and start step 3 with a maximum high threshold
+					threshold = 255;
+				} 
+				break;
+			case 2:
+				// step 2: draw white
+				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
+					calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 3: start decreasing threshold
+				} 
+				break;
+			case 3:
+				// step 3: keep decreasing the lightness threshold until we
+				//         get to much white of the screen (keep drawing white)
+				if ( contourFinder.nBlobs < 1 ) {
+					// There are no blobs yet, keep decreasing the threshold
+					threshold --;
+				} else {
+					// There is a blob, probably we're to far all ready
+					// up the threshold with 5 nodges:
+					threshold += 5;
+					calibratedThreshold = threshold;
+					// Report about the threshold if the beamer was too bright
+					if (threshold > (255 - nCalibrationFailedMininumThreshold) ) {
+						bCalibrationFailedForContrast = true;
+					}
+					// Proceed to the next phase
+					calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 4: Get a threshold to find the 4 corners
+				}
+				break;
+			case 4:
+				// step 4: draw the corners in white
+				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
+					calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 5: start decreasing threshold
+					calibratedHistory = 0;
+				} 
+				break;
+			case 5:
+				// step 5:  keep decreasing the threshold until we see
+				//			the 4 blobs of the 4 corners (keep drawing the corners)
+				
+				// find contours which are between the size of 10 pixels and 1/2 the w*h pixels.
+				// also, find holes is set to true so we will get interior contours as well....
+				// and consider not more than 8 blobs (or holes)
+				contourFinder.findContours(grayDiff, 60, 10000, 6, false);	// dont't look for holes
+				
+				// increase the history
+				calibratedHistory = calibratedHistory << 1;
+				if ( contourFinder.nBlobs != 4 ) {
+					// There are not exactly 4 blobs yet, keep decreasing the threshold
+					threshold --;
+					//cout << "NOT calibratedHistory: " << calibratedHistory << "\n";
+				} else {
+					// Check if the last 10 times also had 4 blobs
+					calibratedHistory ++;
+					int perfectHistoryRecord = int(pow(double(2),20) - 1); // 30 frames
+					//cout << "YES calibratedHistory: " << calibratedHistory << " perfectHistoryRecord: " << perfectHistoryRecord << "\n";
+					if (calibratedHistory == perfectHistoryRecord) {
+						// There are 4 for the last x frames.
+						// This threshold seems fine for tracking the corners
+						// Proceed to the next phase
+						calibrationPhase ++;
+						feedbackBeginTime = ofGetElapsedTimeMillis();
+						// step 6: Align the corners
+					} else {
+						// Not quite yet
+						threshold --;
+					}
+				}
+				break;
+			case 6:
+				// step 6: draw the corners in white
+				if ( (feedbackBeginTime + mininumFeedbackMillis) < ofGetElapsedTimeMillis() ) {
+					//calibrationPhase ++;
+					feedbackBeginTime = ofGetElapsedTimeMillis();
+					// step 7: done
+				} 
+				break;
+			default:
+				// Ready with the calibration:
+				threshold = calibratedThreshold;
+				calibrationPhase = 0;
+				bCalibrateMode = false;
+				bClearBackground = true;
+				break;
+		}
+	}
 }
 
 
@@ -377,22 +504,128 @@ void testApp::draw(){
 	// finally, a report:
 
 	ofSetColor(0xffffff);
+
+//	char calibrateStr[128];
+//	if (bCalibrationFailedForContrast) {
+//		sprintf(calibrateStr, "CALIBRATION FAILED: BEAMER IS TOO BRIGHT");
+//	} else {
+//		sprintf(calibrateStr, "press 'c' to automatically calibrate.");		
+//	}
+	string calibrateStr = bCalibrationFailedForContrast ? "CALIBRATION FAILED: BEAMER IS TOO BRIGHT" : "press 'c' to automatically calibrate.";
 	char reportStr[1024];
 	sprintf(reportStr, "bg subtraction and blob detection\n\
 press 'b' to capture bg\n\
 press 's' to control the video settings\n\
 press ' ' to clear the image\n\
 press ENTER to save the image\n\
-threshold %i (press: +/-) (shift +/-:  +10/-10)\n\
+threshold %i (press: +/-) (shift +/-:  +10/-10)\n\n\
 press '[' / ']' to select a quad point\n\
-use ARROW keys to move the selected point around\n\
+use ARROW keys to move the selected point around (shift step with 10)\n\n\
 quad A: (%i, %i), quad B: (%i, %i)\n\
 quad C: (%i, %i), quad D: (%i, %i)\n\
-num blobs found %i, fps: %f", threshold, quadAx, quadAy, quadBx, quadBy,
+num blobs found %i, fps: %f\n\n%s\n\
+press 'C' to exit calibration mode.", threshold, quadAx, quadAy, quadBx, quadBy,
 			quadCx, quadCy, quadDx, quadDy,
-			contourFinder.nBlobs, ofGetFrameRate());
+			contourFinder.nBlobs, ofGetFrameRate(), calibrateStr.c_str());
 	ofDrawBitmapString(reportStr, 20, 500);
 
+
+	
+	// CALIBRATION MODE
+	if (bCalibrateMode) {
+		
+		switch (calibrationPhase) {
+			case 0:
+				// step 0: draw black
+				ofFill();
+				ofSetColor(0x000000);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				break;
+			case 1:
+				// step 1: take background reference (keep drawing black)
+				ofFill();
+				ofSetColor(0x000000);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				break;
+			case 2:
+				// step 2: draw white
+				ofFill();
+				ofSetColor(0xffffff);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				break;
+			case 3:
+				// step 3: keep increasing lightness threshold (keep drawing white)
+				ofFill();
+				ofSetColor(0xffffff);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				break;
+			case 4:
+				// step 4: draw the corners in white
+				ofFill();
+				ofSetColor(0x000000);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				ofSetColor(0xffffff);
+				ofRect(offsetx + calibrationXOffset, adjustedScreenOffsetY + calibrationYOffset, calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + calibrationYOffset, calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + calibrationXOffset, adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), calibrationCornerSize, calibrationCornerSize);
+				break;
+			case 5:
+				// step 5:  keep decreasing the threshold until we see
+				ofFill();
+				ofSetColor(0x000000);
+				ofRect(offsetx, adjustedScreenOffsetY, screenw, adjustedScreenHeight);
+				ofSetColor(0xffffff);
+				ofRect(offsetx + calibrationXOffset, adjustedScreenOffsetY + calibrationYOffset, calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + calibrationYOffset, calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + calibrationXOffset, adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), calibrationCornerSize, calibrationCornerSize);
+				ofRect(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), calibrationCornerSize, calibrationCornerSize);
+				break;
+			case 6:
+				// step 6: Manual Calibration of Corners
+				ofNoFill();
+				ofSetLineWidth(5);
+				ofSetColor(0xffffff);
+				// A
+				if (selectedQuadPoint == 1) {
+					ofSetColor(0xff6600);
+					ofCircle(offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2), calibrationCornerSize);
+					ofSetColor(0xffffff);
+				}
+				ofLine(offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset,offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset + calibrationCornerSize);
+				ofLine(offsetx + calibrationXOffset, adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2), offsetx + calibrationXOffset + calibrationCornerSize, adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2));
+				// B
+				if (selectedQuadPoint == 2) {
+					ofSetColor(0xff6600);
+					ofCircle(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2), calibrationCornerSize);
+					ofSetColor(0xffffff);
+				}
+				ofLine(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset, offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + calibrationYOffset + calibrationCornerSize);
+				ofLine(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2), offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + calibrationCornerSize, adjustedScreenOffsetY + calibrationYOffset + (calibrationCornerSize / 2));
+				// C
+				if (selectedQuadPoint == 3) {
+					ofSetColor(0xff6600);
+					ofCircle(offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2), calibrationCornerSize);
+					ofSetColor(0xffffff);
+				}
+				ofLine(offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), offsetx + calibrationXOffset + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + calibrationCornerSize);
+				ofLine(offsetx + calibrationXOffset, adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2), offsetx + calibrationXOffset + calibrationCornerSize, adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2));
+				// D
+				if (selectedQuadPoint == 4) {
+					ofSetColor(0xff6600);
+					ofCircle(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2), calibrationCornerSize);
+					ofSetColor(0xffffff);
+				}
+				ofLine(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)), offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + (calibrationCornerSize / 2), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + calibrationCornerSize);
+				ofLine(offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)), adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2), offsetx + (screenw - (calibrationCornerSize + calibrationXOffset)) + calibrationCornerSize, adjustedScreenOffsetY + (adjustedScreenHeight - (calibrationCornerSize + calibrationYOffset)) + (calibrationCornerSize / 2));
+				ofSetLineWidth(1);
+				ofFill();
+				break;
+			default:
+				break;
+		}
+	}
+	
 }
 
 
@@ -409,6 +642,19 @@ void testApp::keyPressed  (int key){
 		// Use the b key to learn the background
 		case 'b':
 			bLearnBackground = true;
+			break;
+		// Use the c key to automatically calibrate
+		case 'c':
+			bCalibrateMode = true;
+			feedbackBeginTime = ofGetElapsedTimeMillis();
+			bClearBackground = true;
+			break;
+		// Use capital (shift) C key to stop calibration mode
+		case 'C':
+			threshold = calibratedThreshold;
+			calibrationPhase = 0;
+			bCalibrateMode = false;
+			bClearBackground = true;
 			break;
 		// Use the spacebar to clear the image
 		case ' ':
@@ -444,25 +690,41 @@ void testApp::keyPressed  (int key){
 		// LEFT
 		case 356:
 			if ( selectQuadx != NULL) {
-				(* selectQuadx) --;
+				if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
+					(* selectQuadx) -= 10;
+				} else {
+					(* selectQuadx) --;
+				}
 			}
 			break;
 		// RIGHT
 		case 358:
 			if ( selectQuadx != NULL) {
-				(* selectQuadx) ++;
+				if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
+					(* selectQuadx) += 10;
+				} else {
+					(* selectQuadx) ++;
+				}
 			}
 			break;
 		// UP
 		case 357:
 			if ( selectQuady != NULL) {
-				(* selectQuady) --;
+				if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
+					(* selectQuady) -= 10;
+				} else {
+					(* selectQuady) --;
+				}
 			}
 			break;
 		// DOWN
 		case 359:
 			if ( selectQuady != NULL) {
-				(* selectQuady) ++;
+				if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
+					(* selectQuady) += 10;
+				} else {
+					(* selectQuady) ++;
+				}
 			}
 			break;
 		// Adjust the treshold of the contour with - / +

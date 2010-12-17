@@ -24,13 +24,23 @@
 #define _CAM_WIDTH 640
 #define _CAM_HEIGHT 480
 
-#define _SCREEN_WIDTH 1536
+//#define _SCREEN_WIDTH 1536
 //#define _SCREEN_WIDTH 1024
+#define _SCREEN_WIDTH 1280
+
 #define _SCREEN_HEIGHT 768
 #define _SCREEN_OFFSET_X 1024
 #define _SCREEN_OFFSET_Y 0
-#define _WINDOW_X 140
-#define _WINDOW_Y 60
+//#define _WINDOW_X 140
+//#define _WINDOW_Y 60
+
+// SIMPLE BEAMER TEST
+//#define _WINDOW_X 265
+//#define _WINDOW_Y 0
+
+// SECONDARY STUDIO TEST
+#define _WINDOW_X 656
+#define _WINDOW_Y 250
 
 
 #define _IDLE_KICKIN_TRESHOLD_MILLIS 60000
@@ -117,8 +127,18 @@ class testApp : public ofBaseApp{
 	int deltaTime;
 
 
-
-	
+	// CALIBRATION
+	bool				bCalibrateMode;
+	int					calibrationPhase;			// counter to keep reference to the current calibration phase
+	int					mininumFeedbackMillis;		// number of milli seconds we at least have to wait for one feedback cycle
+	int					feedbackBeginTime;
+	bool				bCalibrationFailedForContrast;		// Notice the user that the calibration failed because the screen was too bright
+	int					nCalibrationFailedMininumThreshold;
+	int					calibratedThreshold;		// a variable to store the threshold value in
+	int					calibrationCornerSize;
+	int					calibrationXOffset;
+	int					calibrationYOffset;
+	unsigned int		calibratedHistory;			// a long int (32bit) as binary string (0 is bad, 1 is good)
 	
 private:
 	void sendIdleMessage(bool isIdle);
