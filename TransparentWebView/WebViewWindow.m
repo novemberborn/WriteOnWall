@@ -3,15 +3,12 @@
 #import "WebViewWindow.h"
 
 @implementation WebViewWindow
-- (id)initWithContentRect:(NSRect)contentRect 
-		styleMask:(NSUInteger)aStyle 
-		backing:(NSBackingStoreType)bufferingType 
-		defer:(BOOL)flag 
-{
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)aStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)flag {
+	//
 	if(self = [super initWithContentRect:contentRect
-						styleMask:aStyle//NSBorderlessWindowMask 
-						backing:bufferingType 
-						defer:flag]){        
+							   styleMask:aStyle//NSBorderlessWindowMask 
+								 backing:bufferingType 
+								   defer:flag]){        
 		[self setBackgroundColor: [NSColor clearColor]];
 		[self setLevel: NSStatusWindowLevel];
 		[self setAlphaValue: 1.0];
@@ -21,14 +18,13 @@
 	return self;
 }
 
-- (void)awakeFromNib
-{
+- (void)awakeFromNib {
 	[thisWebView setDrawsBackground: NO];
 	[self setView: thisWebView onWindow: self]; 
 }
 
-- (void)setView:(WebView*)view onWindow: (NSWindow*) window
-{
+- (void)setView:(WebView*)view onWindow: (NSWindow*) window {
+	//
 	[view setFrameLoadDelegate:window];
 	[view setUIDelegate:window];
 	[view setResourceLoadDelegate:window];
@@ -39,4 +35,5 @@
 	WebFrame* webFrame = [view mainFrame];
 	[webFrame loadRequest: urlReq];
 }
+
 @end
