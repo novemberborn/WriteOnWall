@@ -11,6 +11,7 @@
 		3FC6456B0CC89D21009F9DB0 /* WebViewWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC6456A0CC89D21009F9DB0 /* WebViewWindow.m */; };
 		3FC645D40CC8B39B009F9DB0 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FC645D30CC8B39B009F9DB0 /* WebKit.framework */; };
 		43D5811312C2735D000AEA60 /* TransparentWebViewAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D5811212C2735D000AEA60 /* TransparentWebViewAppDelegate.m */; };
+		43D5817612C414A4000AEA60 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 43D5817512C414A4000AEA60 /* Icon.icns */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -30,6 +31,7 @@
 		3FC645D30CC8B39B009F9DB0 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		43D5811112C2735D000AEA60 /* TransparentWebViewAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransparentWebViewAppDelegate.h; sourceTree = "<group>"; };
 		43D5811212C2735D000AEA60 /* TransparentWebViewAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransparentWebViewAppDelegate.m; sourceTree = "<group>"; };
+		43D5817512C414A4000AEA60 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* TransparentWebView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransparentWebView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -109,6 +111,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				43D5817512C414A4000AEA60 /* Icon.icns */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 			);
@@ -176,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
+				43D5817612C414A4000AEA60 /* Icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
