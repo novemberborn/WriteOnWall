@@ -485,7 +485,7 @@
 									<int key="NSfFlags">16</int>
 								</object>
 								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
 							</object>
@@ -934,8 +934,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="272153872"/>
 							<reference ref="183874945"/>
-							<reference ref="863188376"/>
 							<reference ref="446915317"/>
+							<reference ref="863188376"/>
 						</object>
 						<reference key="parent" ref="678803503"/>
 					</object>
