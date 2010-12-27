@@ -77,7 +77,7 @@ void testApp::setup(){
 
 	//are we connected to the server - if this fails we
 	//will check every few seconds to see if the server exists
-	weConnected = tcpClient.setup("127.0.0.1", 11999);
+	weConnected = tcpClient.setup("127.0.0.1", 8081);
 	
 	connectTime = 0;
 	deltaTime = 0;
@@ -234,10 +234,11 @@ void testApp::update(){
 	}
 	
 	// TCP SOCKET
-	if (weConnected) {
+	if (weConnected && tcpClient.isConnected()) {
 		// See if we received some messages
 		string msgRx = tcpClient.receive();
 		if( msgRx.length() > 0 ) {
+			//cout << "Received string" << msgRx;
 			if (msgRx == "clear") {
 				cout << "Received an external call for clearScreen()";
 				clearScreen();
