@@ -27,6 +27,10 @@ var grid = new wow.Grid({
   right: "g12"
 });
 
+dojo.ready(function(){
+  grid.overlayGaps(dojo.query("#top > *, #bottom > *"), "#000");
+});
+
 var idleStateObserver = new wow.IdleStateObserver(grid, {
   center: '<img src="/WOW_2.png" width="200px"><br>Use a bright light to write!',
   left: "Use a “flashlight” app on your phone to draw with colors",
