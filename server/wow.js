@@ -32,6 +32,8 @@ tagHandler.on("like", function(tag){
     when(tags.lookupUser(tag), function(user){
       user && capture.like(user);
     });
+  }, function(err){
+    console.error("Failed to capture image for tag %s\n%s", tag, err && err.stack);
   });
 });
 tagHandler.on("made", function(tag){
@@ -39,6 +41,8 @@ tagHandler.on("made", function(tag){
     when(tags.lookupUser(tag), function(user){
       user && capture.made(user);
     });
+  }, function(err){
+    console.error("Failed to capture image for tag %s\n%s", tag, err && err.stack);
   });
 });
 
