@@ -46,8 +46,8 @@ When not in calibration mode, black bars are overlayed on the gaps between the d
 The main server runs Node.js; it requires v0.2.5. Also make sure to install NPM, the Node Package Manager, and then run the following commands to install dependencies:
 
     npm install https://github.com/kriszyp/promised-io/tarball/c53b75064376dc2ef8181b4949bb03fe28b93c63
+    npm install https://github.com/novemberborn/node-static/tarball/node-0.2.x
     npm install iniparser@1.0.1
-    npm install node-static@0.5.2
     npm install socket.io@0.6.3
     npm install watch@0.2.1
     npm install oauth@0.8.4
