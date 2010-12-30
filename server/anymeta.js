@@ -12,7 +12,7 @@ var makeRequest = function(httpMethod, apiMethod, params){
   params.method = apiMethod;
   params.format = "json";
   
-  var url = "http://www.mediamatic.net/services/rest/?" + toQueryString(params);
+  var url = config.entrypoint + "?" + toQueryString(params);
   var signed = oauth.signUrl(url, config.t_key, config.t_sec, httpMethod);
   var query = signed.split("?").slice(1).join("?");
   
