@@ -47,8 +47,13 @@ function reconnect(delay){
 }
 socket.on("disconnect", reconnect);
 socket.on("message", function(msg){
-  dojo.publish(["", msg.type, msg.event || msg.state].join("/"), [msg]);
-  dojo.publish(["", msg.type].join("/"), [msg]);
+  if(msg.type == "statechange"){
+    dojo.publish("/statechange/" + msg.state, [msg]);
+  }else if(msg.type == "tag"){
+    dojo.when(idleStateObserver.suspend(14000), function(){
+      dojo.publish("/tag", [msg]);
+    });
+  }
 });
 </script>
 </head>

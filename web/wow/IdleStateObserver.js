@@ -17,6 +17,10 @@ dojo.declare("wow.IdleStateObserver", null, {
   
   setIdle: function(){
     this._idle = true;
+    if(this._suspended){
+      return;
+    }
+    
     this._hideAnim && this._hideAnim.stop(true);
     
     this._gridNodes.push(
@@ -62,7 +66,7 @@ dojo.declare("wow.IdleStateObserver", null, {
     dojo.connect(this._hideAnim, "onEnd", this, function(){
       this._hideAnim = null;
       this._gridNodes.filter(function(node){ dojo.destroy(node); });
-      this._idle && this.setIdle();
+      this._idle && !this._suspended && this.setIdle();
     });
     var timeoutGeneration = ++this._generation;
     setTimeout(dojo.hitch(this, function(){
@@ -76,5 +80,26 @@ dojo.declare("wow.IdleStateObserver", null, {
     this._idle = false;
     this._showAnim && this._showAnim.stop();
     this._hideAnim && this._hideAnim.play();
+  },
+  
+  suspend: function(resumeAfter){
+    this._suspended = true;
+    var timeoutGeneration = ++this._generation;
+    setTimeout(dojo.hitch(this, function(){
+      this._suspended = false;
+      if(timeoutGeneration === this._generation && this._idle){
+        this.setIdle();
+      }
+    }), resumeAfter);
+    
+    this._showAnim && this._showAnim.stop();
+    if(this._hideAnim){
+      var dfd = new dojo.Deferred;
+      dojo.connect(this._hideAnim, "onEnd", function(){
+        dfd.resolve();
+      });
+      this._hideAnim.play();
+      return dfd.promise;
+    }
   }
 });
