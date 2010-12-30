@@ -42,11 +42,17 @@ tagHandler.on("made", function(tag){
   });
 });
 
+var idle = false;
 openFrameworks.on("active", function(){
+  idle = false;
   webClients.send({ type: "statechange", state: "active" });
 });
 openFrameworks.on("idle", function(){
+  idle = true;
   webClients.send({ type: "statechange", state: "idle" });
+});
+webClients.on("connect", function(client){
+  idle && client.send({ type: "statechange", state: "idle" });
 });
 
 var fileServer = new (require("node-static").Server)("../web", { cache: 0 });
