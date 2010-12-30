@@ -51,6 +51,10 @@ OpenFrameworks.prototype.listen = function(port, hostname){
       ix != -1 && this._streams.splice(ix, 1);
       console.log("OpenFrameworks disconnected\n\t%s streams connected", this._streams.length);
     }.bind(this));
+    stream.on("error", function(err){
+      console.error("OpenFrameworks stream error!\n%s", err && err.stack);
+      stream.end();
+    });
   }.bind(this)).listen(port, hostname);
 };
 
