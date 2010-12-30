@@ -12,7 +12,7 @@ WebClientManager.prototype.listen = function(httpServer){
     client.on("disconnect", function(){
       var ix = this._clients.indexOf(client);
       ix != -1 && this._clients.splice(ix, 1);
-    });
+    }.bind(this));
   }.bind(this));
 };
 
