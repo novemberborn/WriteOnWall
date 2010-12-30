@@ -1,222 +1,66 @@
-var http = require("http"),
-    url = require("url"),
-    static = require("node-static"),
-    fs = require("promised-io/fs"),
-    when = require("promised-io/promise").when,
-    defer = require("promised-io/promise").defer,
-    request = require("promised-io/http-client").request,
-    io = require("socket.io"),
-    applescript = require("applescript"),
-    watch = require("watch"),
-    anymeta = require("./anymeta");
+var when = require("promised-io/promise").when;
 
-var outputDir = process.argv[2];
+var anymetaConfig = require("iniparser").parseSync(require("path").join(process.env.HOME, ".anymeta"))[process.argv[2]];
+if(!anymetaConfig){
+  console.error("Could not determine anymeta config for <%s>", process.argv[2]);
+  process.exit(1);
+}else{
+  require("./anymeta").setup(anymetaConfig);
+}
+
+var outputDir = process.argv[3];
 if(!outputDir){
   console.error("No output dir specified!");
   process.exit(1);
-}else{
-  console.log("Monitoring <%s> for screens", outputDir);
 }
 
-var fileServer = new static.Server("../web", { cache: 0 });
-var httpServer = http.Server(function(req, res){
-  var info = url.parse(req.url, true);
-  
-  // console.log(req.url);
-  if(info.pathname.indexOf("/tag") == 0){
-    var tag = "";
-    var id = info.pathname.split(/\//).pop();
-    req.on("data", function(chunk){ tag += chunk; });
-    req.on("end", function(){
-      var msg = JSON.stringify({ type: "tag", state: req.method == "POST" ? "add" : "remove", data: tag, id: id });
-      console.log(msg);
-      clients.forEach(function(client){
-        client.send(msg);
-      });
-      res.writeHead(200);
-      res.end();
-      
-      if(id == "like" || id == "made"){
-        actOnScreen(tag, id);
-      }else if(id == "clear"){
-        clearScreen(id);
-      }
-    });
-  }else if(info.pathname == "/anymeta"){
-    // TODO: POST requests
-    var proxy = request({
-      url: "http://www.mediamatic.net/services/rest/" + info.search
-    });
-    when(proxy, function(result){
-      res.writeHead(result.status, result.headers);
-      result.body.join("").then(function(body){
-        res.end(body);
-      });
-    });
-  }else{
-    fileServer.serve(req, res);
-  }
-});
+var tags = require("./tags");
+var tagHandler = new tags.TagHandler;
+var openFrameworks = new (require("./of").OpenFrameworks);
+var webClients = new (require("./web").WebClientManager);
 
-var socket = io.listen(httpServer, { transports: ["websocket"] });
-var clients = [];
-socket.on("connection", function(client){
-  clients.push(client);
-  client.on("disconnect", function(){
-    var ix = clients.indexOf(client);
-    ix != -1 && clients.splice(ix, 1);
+tagHandler.on("tag", function(event, tag){
+  when(tags.lookupUser(tag), function(user){
+    webClients.send({ type: "tag", event: event, user: user });
   });
 });
-httpServer.listen(8080, "0.0.0.0");
-
-var outputQueue = [];
-
-function saveScreen(){
-  if(outputQueue.length > 0){
-    return outputQueue[0].promise;
-  }
-  
-  var dfd = defer();
-  applescript.execString('activate application "opencvExample"\ntell application "System Events" to key code 36', function(){});
-  outputQueue.push(dfd);
-  return dfd.promise;
-}
-
-watch.createMonitor(outputDir, function(monitor){
-  monitor.on("created", function(f){
-    if(!outputQueue.length){ return; }
-    
-    var dfd = outputQueue.shift();
-    fs.readFile(f).then(dfd.resolve.bind(dfd));
+tagHandler.on("clear", function(){
+  openFrameworks.send("clear");
+});
+tagHandler.on("like", function(tag){
+  when(openFrameworks.capture(), function(capture){
+    when(tags.lookupUser(tag), function(user){
+      user && capture.like(user);
+    });
+  });
+});
+tagHandler.on("made", function(tag){
+  when(openFrameworks.capture(), function(capture){
+    when(tags.lookupUser(tag), function(user){
+      user && capture.made(user);
+    });
   });
 });
 
-var tags = {};
-function identifyUser(tag){
-  return tags[tag] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + tag }).then(function(user){
-    return tags[tag] = user;
-  }, function(){
-    return null;
-  });
-}
+openFrameworks.on("active", function(){
+  webClients.send({ type: "statechange", state: "active" });
+});
+openFrameworks.on("idle", function(){
+  webClients.send({ type: "statechange", state: "idle" });
+});
 
-var lastScreen;
-var USE_LAST_FOR = 10000;
-function actOnScreen(tag, id){
-  var user = identifyUser(tag);
-  var screen;
-  if(lastScreen && Date.now() - lastScreen.time < USE_LAST_FOR){
-    screen = lastScreen.screen;
-  }else{
-    screen = saveScreen();
-    screen.then(function(img){
-      lastScreen = {
-        screen: img,
-        time: Date.now()
-      };
-    });
-  }
-  when(screen, function(img){
-    when(user, function(user){
-        if(!user){ return; }
-        console.log("Identified user for tag %s", tag);
-        // console.dir(user);
-        
-        var attachment = img.attachment;
-        if(!attachment){
-          attachment = img.attachment = anymeta.post("anymeta.attachment.create", {
-            data: img.toString("base64"),
-            mime: "image/png",
-            title: "Wow! Painting at " + new Date().toTimeString().split(":").slice(0,2).join(":")
-          }).then(function(response){
-            console.log("Uploaded image");
-            // console.dir(response);
-            return response;
-          }, function(){ return null; });
-        }
-        
-        when(attachment, function(response){
-          if(!response){ return; }
-          console.log("Adding AUTHOR");
-          var thingId = response.thg_id;
-          var authorEdge = true;
-          if(id == "made"){
-            authorEdge = anymeta.post("anymeta.edge.add", {
-              id: thingId,
-              object: user.rsc_id,
-              predicate: "AUTHOR"
-            }, function(){
-              return null;
-            });
-          }
-          
-          when(authorEdge, function(authorEdgeResponse){
-            if(!authorEdgeResponse){ return null; }
-            console.log("Publishing");
-            anymeta.post("anymeta.thing.update", { thing_id: thingId, "data[pubstate]": 1 }).then(function(){
-              var params = {};
-              if(id == "like"){
-                params.id = user.rsc_id;
-                params.object = thingId;
-                params.modifier_id = user.rsc_id;
-                params.predicate = "INTEREST";
-              }else{
-                params.id = thingId;
-                params.object = user.rsc_id;
-                params.predicate = "ACTOR";
-              }
-              console.log("Adding INTEREST or ACTOR");
-              anymeta.post("anymeta.edge.add", params).then(function(){
-                console.log("Completed");
-              }, function(){
-                return null;
-              });
-            }, function(){
-              return null;
-            });
-          }, function(){
-            return null;
-          });
-        });
+var fileServer = new (require("node-static").Server)("../web", { cache: 0 });
+var httpServer = require("http").Server(function(req, res){
+  tagHandler.handle(req).then(
+      function(){
+        res.writeHead(200);
+        res.end();
       },
-      function(err){
-        console.error("Couldn't find user for tag %s", tag);
+      function(){
+        fileServer.serve(req, res);
       });
-  });
-}
-
-function clearScreen(){
-  applescript.execString('activate application "opencvExample"\ntell application "System Events" to key code 49', function(){});
-}
-
-var idle = false;
-var net = require("net");
-net.Server(function(stream){
-  stream.setEncoding("utf8");
-  stream.on("data", function(data){
-    var msg = { type: "statechange" };
-    if(data.indexOf("active") == 0){
-      msg.state = "active";
-      idle = false;
-    }
-    if(data.indexOf("idle") == 0){
-      msg.state = "idle";
-      idle = Date.now();
-    }
-    msg = JSON.stringify(msg);
-    clients.forEach(function(client){
-      client.send(msg);
-    });
-    setTimeout(function(){
-      if(idle && Date.now() - idle >= 5 * 60 * 1000){
-        var msg = JSON.stringify({ type: "requestClear" });
-        clients.forEach(function(client){
-          client.send(msg);
-        });
-      }
-    }, 5 * 60 * 1000);
-  });
-  stream.on("end", function(){
-    stream.end();
-  });
-}).listen(8081, "0.0.0.0");
+});
+webClients.listen(httpServer);
+httpServer.listen(8080, "0.0.0.0");
+openFrameworks.listen(8081, "0.0.0.0");
+openFrameworks.watch(outputDir);

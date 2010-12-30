@@ -1,15 +1,19 @@
 var request = require("promised-io/http-client").request,
     toQueryString = require("promised-io/querystring").toQueryString;
 
-var oaa = JSON.parse(require("fs").readFileSync("../web/oaa.json"));
-var oauth = new (require("oauth").OAuth)("", "", oaa.consumer.key, oaa.consumer.secret, "1.0", null, "HMAC-SHA1");
+var config, oauth;
+exports.setup = function(newConfig){
+  config = newConfig;
+  oauth = new (require("oauth").OAuth)("", "", config.c_key, config.c_sec, "1.0", null, "HMAC-SHA1");
+};
+
 var makeRequest = function(httpMethod, apiMethod, params){
   params = params || {};
   params.method = apiMethod;
   params.format = "json";
   
   var url = "http://www.mediamatic.net/services/rest/?" + toQueryString(params);
-  var signed = oauth.signUrl(url, oaa.token.key, oaa.token.secret, httpMethod);
+  var signed = oauth.signUrl(url, config.t_key, config.t_sec, httpMethod);
   var query = signed.split("?").slice(1).join("?");
   
   var requestObj = {
@@ -52,11 +56,3 @@ exports.put = makeRequest.bind(exports, "PUT");
 exports.post = makeRequest.bind(exports, "POST");
 exports.delete = makeRequest.bind(exports, "DELETE");
 exports.del = makeRequest.bind(exports, "DELETE");
-
-//exports.get("anymeta.user.info").then(function(response){
-//  console.log(response.title);
-//});
-
-// exports.post("anymeta.attachment.create", { data: "", mime: "image/png" }).then(function(response){
-//   console.dir(response);
-// });
