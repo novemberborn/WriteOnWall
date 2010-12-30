@@ -134,13 +134,28 @@ Capture.prototype.save = function(predicate, user){
   var addAuthor = this.addAuthor.bind(this);
   var addInterest = this.addInterest.bind(this);
   
-  attempt(createAttachment(3), function(){
-    attempt(predicate == "AUTHOR" && addAuthor(3, user), function(){
-      attempt(publish(3), function(){
-        predicate == "INTEREST" && addInterest(3, user);
+  if(!this._savePromise){
+    console.log("Saving capture <%s>", this.src);
+    var dfd = defer();
+    this._savePromise = dfd.promise;
+    attempt(createAttachment(3), function(){
+      attempt(predicate == "AUTHOR" && addAuthor(3, user), function(){
+        attempt(publish(3), function(){
+          predicate == "INTEREST" && addInterest(3, user);
+          dfd.resolve();
+        });
       });
     });
-  });
+  }else{
+    console.log("Waiting for capture <%s> being saved before adding %s[%s/%s]", this.src, predicate, user.rsc_id, user.title);
+    this._savePromise.then(function(){
+      if(predicate == "AUTHOR"){
+        addAuthor(3, user);
+      }else if(predicate == "INTEREST"){
+        addInterest(3, user);
+      }
+    });
+  }
 };
 
 Capture.prototype.createAttachment = function(retries){
