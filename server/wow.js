@@ -1,16 +1,15 @@
 var when = require("promised-io/promise").when;
 
-var anymetaConfig = require("iniparser").parseSync(require("path").join(process.env.HOME, ".anymeta"))[process.argv[2]];
-if(!anymetaConfig){
+var config = require("iniparser").parseSync(require("path").join(process.env.HOME, ".anymeta"))[process.argv[2]];
+if(!config){
   console.error("Could not determine anymeta config for <%s>", process.argv[2]);
   process.exit(1);
 }else{
-  require("./anymeta").setup(anymetaConfig);
+  require("./anymeta").setup(config);
 }
 
-var outputDir = process.argv[3];
-if(!outputDir){
-  console.error("No output dir specified!");
+if(!config.outputdir){
+  console.error("No output dir specified in .anymeta config!");
   process.exit(1);
 }
 
@@ -83,4 +82,4 @@ var httpServer = require("http").Server(function(req, res){
 webClients.listen(httpServer);
 httpServer.listen(8080, "0.0.0.0");
 openFrameworks.listen(8081, "0.0.0.0");
-openFrameworks.watch(outputDir);
+openFrameworks.watch(config.outputdir);
