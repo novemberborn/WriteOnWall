@@ -68,7 +68,9 @@ webClients.on("connect", function(client){
   idle && client.send({ type: "statechange", state: "idle" });
 });
 
-var fileServer = new (require("node-static").Server)("../web", { cache: 0 });
+var webRoot = require("path").join(__dirname, "..", "web");
+console.log("Serving web pages from <%s>", webRoot);
+var fileServer = new (require("node-static").Server)(webRoot, { cache: 0 });
 var httpServer = require("http").Server(function(req, res){
   tagHandler.handle(req).then(
       function(){
