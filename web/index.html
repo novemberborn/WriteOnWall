@@ -2,194 +2,40 @@
 <html>
 <head>
 <meta charset="utf8">
-<style>
-html {
-  font: 300%/1.2 Georgia;
-  color:#FFF;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-/*  background:#fff; */
-}
-
-#top {
-  position: absolute;
-  width: 100%;
-  height: 278px;
-  top: 0;
-  left: 0;
-  font-style: italic;
-}
-
-#bottom {
-  position: absolute;
-  width: 100%;
-  height: 473px;
-  bottom: 0;
-  left: 0;
-  overflow: hidden;
-}
-
-#top > * {
-/*  background: red; */
-}
-
-#bottom > * {
-/*  background: blue; */
-}
-
-#top > *, #bottom > * {
-  position: absolute;
-  top: 0;
-  width: 486px;
-  height: 100%;
-  padding: 48px;
-  -webkit-box-sizing: border-box;
-  -webkit-transform: rotateY(180deg) rotateX(180deg);
-}
-
-#top > * > *, #bottom > * > * {
-  -webkit-transform: rotateX(180deg);
-  display: block;
-  padding: 0 0 0 24px;
-  margin-top: 0;
-  overflow: hidden;
-}
-
-#bottom > * > * {
-  background: #E20074;
-}
-
-#bottom img {
-  padding: 0 74px;
-  width: 200px;
-  background: #FFF;
-}
-
-.left {
-  left: 0;
-}
-
-.middle {
-  left: 520px;
-  width:492px !important;
-}
-
-.right {
-  left: 1054px;
-}
-</style>
+<link rel="stylesheet" href="/style.css">
 <script src="/Socket.IO/socket.io.js"></script>
-<script src="/dojotoolkit/dojo/dojo.js"></script>
+<script src="/dojo/dojo.js"></script>
 <script>
 dojo.require("dojo.fx");
-dojo.registerModulePath("dojox", "/dojotoolkit/dojox");
 dojo.registerModulePath("wow", "/wow");
+dojo.require("wow.Grid");
+dojo.require("wow.IdleStateObserver");
+dojo.require("wow.TagObserver");
 
-dojo.require("wow.Anymeta");
-var anymeta;
-dojo.xhrGet({ url:"/oaa.json", handleAs:"json", sync:true}).then(function(oaa){
-  anymeta = new wow.Anymeta("http://www.mediamatic.net/services/rest/", oaa);
+var grid = new wow.Grid({
+  like: "g10",
+  left: "g10",
+  made: "g11",
+  center: "g11",
+  clear: "g12",
+  right: "g12"
 });
 
-var tags = {};
-var unregistered = { like: "Register your tag to give&nbsp;props", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;scene!" };
-var labels = { like: "gave&nbsp;props", made: "claimed this&nbsp;piece", clear: "cleared the&nbsp;scene!" };
-var grids = { like: "g10", made: "g11", clear: "g12" };
-var outstandingAnims = [];
-var idle = false;
-var interesting = false;
+var idleStateObserver = new wow.IdleStateObserver(grid, {
+  center: '<img src="/WOW_2.png" width="200px"><br>Use a bright light to write!',
+  left: "Use a “flashlight” app on your phone to draw with colors",
+  right: "Write on this wall with a light source"
+});
+idleStateObserver.observe("/statechange/active", "/statechange/idle");
 
-function clearScreen(){
-  dojo.fx.combine(outstandingAnims).play();
-  outstandingAnims = [];
-  interesting = false;
-}
-
-var idleLikeGrid = true;
-var lastIdleNodes = [];
-function showIdle(){
-  lastIdleNodes = [];
-  lastIdleNodes.push(dojo.create("p", {
-    innerHTML: '<img src="/WOW_2.png" width="200px"><br>Use a bright light to write!',
-    style: {
-      opacity: 0,
-      height: 0,
-      paddingTop: "24px"
-    }
-  }, grids.made, "first"));
-  
-  var title;
-  if(idleLikeGrid){
-    title = "Use a “flashlight” app on your phone to draw with colors";
-  }else{
-    title = "Write on this wall with a light source";
-  }
-  lastIdleNodes.push(dojo.create("p", {
-    innerHTML: title,
-    style: {
-      opacity: 0,
-      height: 0
-    }
-  }, idleLikeGrid ? grids.like : grids.clear, "first"));
-  
-  idleLikeGrid = !idleLikeGrid;
-  dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
-    anims.push(dojo.fx.chain([
-      dojo.fx.wipeIn({ node: rendered }),
-      dojo.fadeIn({ node: rendered, start: 0, duration: 1000 })
-    ]));
-    return anims;
-  }, [])).play();
-  var combined = dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
-    anims.push(
-      dojo.fadeOut({
-        node: rendered,
-        start: 1,
-        end: 0,
-        duration: 1000
-      })
-    );
-    return anims;
-  }, []));
-  dojo.connect(combined, "onEnd", function(){
-    lastIdleNodes.forEach(function(rendered){ dojo.destroy(rendered); });
-    if(idle){ showIdle(); }
-  });
-  combined.play(8000);
-}
-
-function hideIdle(){
-  var combined = dojo.fx.combine(lastIdleNodes.reduce(function(anims, rendered){
-    anims.push(
-      dojo.fadeOut({
-        node: rendered,
-        start: 1,
-        end: 0,
-        duration: 1000
-      })
-    );
-    return anims;
-  }, []));
-  dojo.connect(combined, "onEnd", function(){
-    lastIdleNodes.forEach(function(rendered){ dojo.destroy(rendered); });
-    if(idle){ showIdle(); }
-  });
-  combined.play();
-}
+var tagObserver = new wow.TagObserver(grid,
+    { like: "Register your tag to give&nbsp;props", made: "Register your tag to take&nbsp;credit", clear: "Somebody cleared the&nbsp;scene!" },
+    { like: "gave&nbsp;props", made: "claimed this&nbsp;piece", clear: "cleared the&nbsp;scene!" });
+tagObserver.observe("/tag");
 
 var socket = new io.Socket(null, { transports: ["websocket"] });
 setTimeout(function(){ socket.connect(); }, 2000);
-socket.on("connect", function(){
-  console.log("connected");
-});
-socket.on("disconnect", reconnect);
-
 function reconnect(delay){
-  console.log("reconnecting…");
   setTimeout(function(){
     if(socket.connected){ return; }
     if(socket.connecting){ return socket.disconnect(); }
@@ -199,71 +45,10 @@ function reconnect(delay){
     reconnect(1000);
   }, delay || 0);
 }
-
+socket.on("disconnect", reconnect);
 socket.on("message", function(msg){
-  msg = JSON.parse(msg);
-  console.log("socket message:", msg);
-  
-  if(msg.type == "tag" && msg.state == "add"){
-    var tag = tags[msg.data] || anymeta.get("identity.identify", { type: "rfid", raw: "urn:rfid:" + msg.data }).then(function(response){
-      return tags[msg.data] = response;
-    }, function(){ return false; });
-    dojo.when(tag, function(thing){
-      var title = thing ? thing.title + " " + labels[msg.id] : unregistered[msg.id];
-      var rendered = dojo.create("p", {
-        innerHTML: title,
-        style: {
-          opacity: 0,
-          height: 0
-        }
-      }, grids[msg.id], "first");
-      
-      dojo.fx.chain([
-        dojo.fx.wipeIn({ node: rendered }),
-        dojo.fadeIn({ node: rendered, start: 0, duration: 1000 })
-      ]).play();
-      var removeAnim = dojo.fadeOut({
-        node: rendered,
-        start: 1,
-        end: 0,
-        duration: 1000,
-        onEnd: function(){
-          dojo.destroy(rendered);
-        }
-      });
-      
-      if(msg.id == "clear"){
-        clearScreen();
-      }
-      
-      setTimeout(function(){
-        var ix = dojo.indexOf(outstandingAnims, removeAnim);
-        if(ix != -1){
-          removeAnim.play();
-          outstandingAnims.splice(ix, 1);
-        }
-      }, 8000);
-      outstandingAnims.push(removeAnim);
-    });
-    
-    if(msg.id == "like" || msg.id == "made"){
-      interesting = true;
-    }
-  }
-  
-  if(msg.type == "statechange"){
-    if(msg.state == "active"){
-      idle = false;
-      hideIdle();
-    }else if(!idle){
-      idle = true;
-      showIdle();
-    }
-  }
-  
-  if(msg.type == "requestClear"){
-    !interesting && clearScreen();
-  }
+  dojo.publish(["", msg.type, msg.event || msg.state].join("/"), [msg]);
+  dojo.publish(["", msg.type].join("/"), [msg]);
 });
 </script>
 </head>
