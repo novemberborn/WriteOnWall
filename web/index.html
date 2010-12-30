@@ -46,9 +46,14 @@ function reconnect(delay){
   }, delay || 0);
 }
 socket.on("disconnect", reconnect);
+socket.on("disconnect", function(){
+  // Force active state when we lose connection from the server.
+  // That way people can still paint even if the UI is disconnected.
+  dojo.publish("/statechange/active");
+});
 socket.on("message", function(msg){
   if(msg.type == "statechange"){
-    dojo.publish("/statechange/" + msg.state, [msg]);
+    dojo.publish("/statechange/" + msg.state);
   }else if(msg.type == "tag"){
     dojo.when(idleStateObserver.suspend(14000), function(){
       dojo.publish("/tag", [msg]);
