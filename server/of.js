@@ -56,7 +56,7 @@ OpenFrameworks.prototype.listen = function(port, hostname){
 
 OpenFrameworks.prototype.send = function(data){
   this._streams.forEach(function(stream){
-    stream.write(data);
+    stream.write(data + "[/TCP]");
   });
 };
 
