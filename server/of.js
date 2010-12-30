@@ -29,6 +29,8 @@ OpenFrameworks.prototype = Object.create(EventEmitter.prototype, {
 OpenFrameworks.prototype.listen = function(port, hostname){
   require("net").Server(function(stream){
     this._streams.push(stream);
+    console.log("OpenFrameworks connected\n\t%s streams connected", this._streams.length);
+    
     stream.setEncoding("utf8");
     stream.on("data", function(data){
       if(data.indexOf("active") == 0){
@@ -47,6 +49,7 @@ OpenFrameworks.prototype.listen = function(port, hostname){
       stream.end();
       var ix = this._streams.indexOf(stream);
       ix != -1 && this._streams.splice(ix, 1);
+      console.log("OpenFrameworks disconnected\n\t%s streams connected", this._streams.length);
     }.bind(this));
   }.bind(this)).listen(port, hostname);
 };
@@ -62,18 +65,26 @@ OpenFrameworks.prototype.watch = function(outputDir){
     console.log("Monitoring <%s> for screens", outputDir);
     monitor.on("created", function(f){
       var dfd = this._captureDeferred;
-      dfd && fs.readFile(f).then(dfd.resolve.bind(dfd), dfd.reject.bind(dfd));
+      dfd && fs.readFile(f).then(
+          function(buffer){
+            buffer.src = f;
+            dfd.resolve(buffer);
+          },
+          dfd.reject.bind(dfd));
     }.bind(this));
   }.bind(this));
 };
 
 OpenFrameworks.prototype.capture = function(){
   if(this._lastCapture && Date.now() < this._lastCapture.expires){
+    console.log("Reuse last capture <%s>", this._lastCapture.src);
     return this._lastCapture;
   }else if(this._capturePromise){
+    console.log("Reuse existing capture promise");
     return this._capturePromise;
   }
   
+  console.log("Capturing screen");
   this.send("capture");
   this._lastCapture = null;
   var dfd = this._captureDeferred = defer();
@@ -105,6 +116,7 @@ OpenFrameworks.prototype.capture = function(){
 
 function Capture(buffer){
   this.buffer = buffer;
+  this.src = buffer.src;
   this.expires = 0;
 }
 
@@ -134,12 +146,14 @@ Capture.prototype.save = function(predicate, user){
 Capture.prototype.createAttachment = function(retries){
   if(--retries < 0){ throw new Error("Gave up"); }
   
+  console.log("Creating attachment for capture <%s>; %s retries remaining", this.src, retries);
   return this.attachmentId || anymeta.post("anymeta.attachment.create", {
     data: this.buffer.toString("base64"),
     mime: "image/png",
     title: "Wow! Painting at " + new Date().toTimeString().split(":").slice(0, 2).join(":")
   }).then(
       function(response){
+        console.log("Attachment for capture <%s> = %s", this.src, response.thg_id);
         return this.attachmentId = response.thg_id;
       }.bind(this),
       function(){
@@ -150,11 +164,13 @@ Capture.prototype.createAttachment = function(retries){
 Capture.prototype.publish = function(retries){
   if(--retries < 0){ throw new Error("Gave up"); }
   
+  console.log("Publishing capture <%s>; %s retries remaining", this.src, retries);
   return this.published || anymeta.post("anymeta.thing.update", {
     thing_id: this.attachmentId,
     "data[pubstate]": 1
   }).then(
     function(){
+      console.log("Published capture <%s>#%s", this.src, this.attachmentId);
       this.published = true;
     }.bind(this),
     function(){
@@ -165,12 +181,15 @@ Capture.prototype.publish = function(retries){
 Capture.prototype.addAuthor = function(retries, user){
   if(--retries < 0){ throw new Error("Gave up"); }
   
+  console.log("Adding AUTHOR[%s/%s] to capture <%s>#%s; %s retries remaining", user.rsc_id, user.title, this.src, this.attachmentId, retries);
   return anymeta.post("anymeta.edge.add", {
     id: this.attachmentId,
     object: user.rsc_id,
     predicate: "AUTHOR"
   }).then(
-      null,
+      function(){
+        console.log("Added AUTHOR[%s/%s] to capture <%s>#%s", user.rsc_id, user.title, this.src, this.attachmentId);
+      }.bind(this),
       function(){
         return this.addAuthor(retries, user);
       }.bind(this));
@@ -179,13 +198,16 @@ Capture.prototype.addAuthor = function(retries, user){
 Capture.prototype.addInterest = function(retries, user){
   if(--retries < 0){ throw new Error("Gave up"); }
   
+  console.log("Adding INTEREST[%s/%s] to capture <%s>; %s retries remaining", user.rsc_id, user.title, this.src, retries);
   return anymeta.post("anymeta.edge.add", {
     id: user.rsc_id,
     object: this.attachmentId,
     modifier_id: user.rsc_id,
     predicate: "INTEREST"
   }).then(
-      null,
+      function(){
+        console.log("Added INTEREST[%s/%s] to capture <%s>#%s", user.rsc_id, user.title, this.src, this.attachmentId);
+      }.bind(this),
       function(){
         return this.addInterest(retries, user);
       }.bind(this));

@@ -20,7 +20,9 @@ var openFrameworks = new (require("./of").OpenFrameworks);
 var webClients = new (require("./web").WebClientManager);
 
 tagHandler.on("tag", function(event, tag){
+  console.log("Tag %s[%s]", tag, event);
   when(tags.lookupUser(tag), function(user){
+    console.log("Tag %s[%s] --> %s", tag, event, user && user.title || "anonymous");
     webClients.send({ type: "tag", event: event, user: user });
   });
 });
@@ -30,7 +32,10 @@ tagHandler.on("clear", function(){
 tagHandler.on("like", function(tag){
   when(openFrameworks.capture(), function(capture){
     when(tags.lookupUser(tag), function(user){
-      user && capture.like(user);
+      if(user){
+        console.log("Capture <%s>[like] --> %s", capture.src, user.title);
+        capture.like(user);
+      }
     });
   }, function(err){
     console.error("Failed to capture image for tag %s\n%s", tag, err && err.stack);
@@ -39,7 +44,10 @@ tagHandler.on("like", function(tag){
 tagHandler.on("made", function(tag){
   when(openFrameworks.capture(), function(capture){
     when(tags.lookupUser(tag), function(user){
-      user && capture.made(user);
+      if(user){
+        console.log("Capture <%s>[made] --> %s", capture.src, user.title);
+        capture.made(user);
+      }
     });
   }, function(err){
     console.error("Failed to capture image for tag %s\n%s", tag, err && err.stack);
@@ -49,10 +57,12 @@ tagHandler.on("made", function(tag){
 var idle = false;
 openFrameworks.on("active", function(){
   idle = false;
+  console.log("Active");
   webClients.send({ type: "statechange", state: "active" });
 });
 openFrameworks.on("idle", function(){
   idle = true;
+  console.log("Idle");
   webClients.send({ type: "statechange", state: "idle" });
 });
 webClients.on("connect", function(client){
