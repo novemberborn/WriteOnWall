@@ -76,15 +76,30 @@ OpenFrameworks.prototype.capture = function(){
   
   this.send("capture");
   this._lastCapture = null;
-  this._captureDeferred = defer();
+  var dfd = this._captureDeferred = defer();
+  
+  // Wait max 10 seconds to receive a capture, else cancel it
+  var wasResolved = false;
+  setTimeout(function(){
+    if(wasResolved){ return; }
+    
+    console.log("Retrieving capture took too long, canceling");
+    wasResolved = true;
+    dfd.reject(new Error("Timeout"));
+  }, 10000);
+  
   return this._capturePromise = this._captureDeferred.then(
       function(buffer){
-        var capture = new Capture(buffer);
-        capture.expires = Date.now() + this.reuseCapture;
-        return capture;
+        wasResolved = true;
+        this._captureDeferred = this._capturePromise = null;
+        this._lastCapture = new Capture(buffer);
+        this._lastCapture.expires = Date.now() + this.reuseCapture;
+        return this._lastCapture;
       }.bind(this),
       function(err){
+        wasResolved = true;
         this._captureDeferred = this._capturePromise = null;
+        throw err;
       }.bind(this));
 };
 
