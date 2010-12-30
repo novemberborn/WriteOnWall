@@ -7,15 +7,20 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-/* ENABLE FOR DEBUGGING */
-/*  background:#fff; */
+}
+
+body.calibrate {
+  background: #FFF;
+}
+
+body.calibrate #top > *,
+body.calibrate #bottom > * {
+  background: black;
 }
 
 #top {
   position: absolute;
   width: 100%;
-/* HOLDS THE "WRITE ON WALL" TEXT, TUNED TO TOP WINDOWS AT MEDIAMATIC BANK */
-  height: 278px;
   top: 0;
   left: 0;
   font-style: italic;
@@ -24,28 +29,15 @@ html, body {
 #bottom {
   position: absolute;
   width: 100%;
-/* THE INFO BOXES WILL BE SHOWN HERE, TUNED TO THE BOTTOM WINDOWS AT MEDIAMATIC BANK */
-  height: 473px;
   bottom: 0;
   left: 0;
   overflow: hidden;
 }
 
-#top > * {
-/* ENABLE FOR DEBUGGING */
-/*  background: red; */
-}
-
-#bottom > * {
-/* ENABLE FOR DEBUGGING */
-/*  background: blue; */
-}
-
 #top > *, #bottom > * {
   position: absolute;
   top: 0;
-/* BASE COLUMN WIDTH, TUNED TO WINDOWS AT MEDIAMATIC BANK */
-  width: 486px;
+  width: 33%;
   height: 100%;
   padding: 48px;
   -webkit-box-sizing: border-box;
@@ -65,24 +57,65 @@ html, body {
 }
 
 #bottom img {
-  padding: 0 74px;
-/* IMPACTS IMAGE USED IN MIDDLE COLUMN DURING IDLE STATE */
-  width: 200px;
   background: #FFF;
 }
 
-.left {
-/* POSITION AND WIDTH TUNED FOR WINDOWS AT MEDIAMATIC BANK */
+/* TUNING HERE */
+
+/* IMPACTS IMAGE USED IN MIDDLE COLUMN DURING IDLE STATE */
+#bottom img {
+  padding: 0 74px;
+  width: 200px;
+}
+
+/* COLUMN WIDTHS, SHARED BETWEEN TOP AND BOTTOM SECTIONS */
+#top .left, #bottom .left {
   left: 0;
+  width: 494px !important;
 }
 
-.middle {
-/* POSITION AND WIDTH TUNED FOR WINDOWS AT MEDIAMATIC BANK */
-  left: 520px;
-  width:492px !important;
+#top .middle, #bottom .middle {
+  left: 528px;
+  width: 494px !important;
 }
 
-.right {
-/* POSITION AND WIDTH TUNED FOR WINDOWS AT MEDIAMATIC BANK */
-  left: 1054px;
+#top .right, #bottom .right {
+  left: 1060px;
+}
+
+/* TOP SECTION COLUMN HEIGHTS */
+#top .left {
+  height: 276px !important;
+}
+
+#top .middle {
+  height: 279px !important;
+}
+
+#top .right {
+  height: 281px !important;
+}
+
+/* BOTTOM SECTION COLUMN HEIGHTS */
+#bottom {
+/* MUST BE MAX HEIGHT OF ALL BOTTOM WINDOWS */
+  height: 476px;
+}
+
+#bottom .left {
+  height: 476px !important;
+}
+
+#bottom .middle {
+/* TOP-MARGIN + HEIGHT == MAX HEIGHT OF ALL BOTTOM WINDOWS */
+  margin-top: 4px !important;
+  height: 472px !important;
+  left: 526px;
+  width: 496px !important;
+}
+
+#bottom .right {
+  /* TOP-MARGIN + HEIGHT == MAX HEIGHT OF ALL BOTTOM WINDOWS */
+  margin-top: 5px !important;
+  height: 471px !important;
 }

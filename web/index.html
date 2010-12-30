@@ -6,6 +6,12 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/dojo/dojo.js"></script>
 <script>
+dojo.ready(function(){
+  if(window.location.search == "?calibrate"){
+    dojo.addClass(dojo.body(), "calibrate");
+  }
+});
+
 dojo.require("dojo.fx");
 dojo.registerModulePath("wow", "/wow");
 dojo.require("wow.Grid");
