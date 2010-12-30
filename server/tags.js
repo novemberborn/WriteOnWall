@@ -26,7 +26,7 @@ TagHandler.prototype.handle = function(req){
         this.emit("tag", event, tag);
         this.emit(event, tag);
         dfd.resolve(tag);
-      });
+      }.bind(this));
     }else{
       dfd.resolve();
     }
