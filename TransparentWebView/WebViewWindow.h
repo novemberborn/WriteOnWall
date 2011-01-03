@@ -6,5 +6,6 @@
    IBOutlet WebView* thisWebView;
 }
 
+- (void)setDrawsBackgroundSettings;
 - (void)setView:(WebView*)view onWindow: (NSWindow*) window;
 @end

@@ -6,9 +6,9 @@
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)aStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)flag {
 	//
 	if( self = [super initWithContentRect:contentRect
-							   styleMask:aStyle//NSBorderlessWindowMask 
-								 backing:bufferingType 
-								   defer:flag] ) {        
+								styleMask:aStyle//NSBorderlessWindowMask 
+								  backing:bufferingType 
+									defer:flag] ) {        
 		[self setBackgroundColor: [NSColor clearColor]];
 		[self setLevel: NSStatusWindowLevel];
 		[self setAlphaValue: 1.0];
@@ -20,6 +20,10 @@
 
 - (void)awakeFromNib {
 	NSLog(@"WebViewWindow awakes from Nib");
+	[self setDrawsBackgroundSettings];
+}
+
+- (void)setDrawsBackgroundSettings {
 	[thisWebView setDrawsBackground: NO];
 	[self setView: thisWebView onWindow: self]; 
 }

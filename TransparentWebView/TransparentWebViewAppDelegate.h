@@ -11,11 +11,16 @@
 #import <WebKit/WebFrame.h>
 
 extern NSString *const TWVLocationUrlKey;
+extern NSString *const TWVBorderlessWindowKey;
+extern NSString *const TWVDrawCroppedUnderTitleBarKey;
+extern NSString *const TWVMainTransparantWindowFrameKey;
 
-
-@interface TransparentWebViewAppDelegate : NSObject <NSApplicationDelegate> {
+@interface TransparentWebViewAppDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate> {
     NSWindow *window;
 	WebView *theWebView;
+	
+	NSMenuItem *borderlessWindowMenuItem;
+	NSMenuItem *cropUnderTitleBarMenuItem;
 	
 	NSWindow *locationSheet;
 	NSString *urlString;
@@ -23,6 +28,9 @@ extern NSString *const TWVLocationUrlKey;
 
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet WebView *theWebView;
+
+@property (assign) IBOutlet NSMenuItem *borderlessWindowMenuItem;
+@property (assign) IBOutlet NSMenuItem *cropUnderTitleBarMenuItem;
 
 @property (assign) IBOutlet NSWindow *locationSheet;
 @property (nonatomic, retain) NSString *urlString;
@@ -33,6 +41,15 @@ extern NSString *const TWVLocationUrlKey;
 - (IBAction)endLocationSheet:(id)sender;
 - (IBAction)cancelLocationSheet:(id)sender;
 
+- (IBAction)toggleBorderlessWindow:(id)sender;
+- (IBAction)toggleCropUnderTitleBar:(id)sender;
+
 - (void)loadUrlString:(NSString *)anUrlString IntoWebView:(WebView *)aWebView;
+
+- (void)setBorderlessWindowMenuItemState:(BOOL)booleanState;
+- (void)setCropUnderTitleBarMenuItemState:(BOOL)booleanState;
+
+- (void)replaceWindowWithBorderlessWindow:(BOOL)borderlessFlag WithContentRect:(NSRect)contentRect;
+- (void)cropContentUnderTitleBar:(BOOL)cropUnderTitleFlag;
 
 @end
