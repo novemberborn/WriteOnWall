@@ -15,7 +15,11 @@ extern NSString *const TWVBorderlessWindowKey;
 extern NSString *const TWVDrawCroppedUnderTitleBarKey;
 extern NSString *const TWVMainTransparantWindowFrameKey;
 
+#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
+@interface TransparentWebViewAppDelegate : NSObject {
+#else
 @interface TransparentWebViewAppDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate> {
+#endif
     NSWindow *window;
 	WebView *theWebView;
 	
