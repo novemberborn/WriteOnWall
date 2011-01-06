@@ -411,6 +411,8 @@ void testApp::saveImage() {
 
 void testApp::clearScreen() {
 	bClearBackground = true;
+	// and send out active message
+	sendIdleMessage(false);
 }
 
 
