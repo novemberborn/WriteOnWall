@@ -71,29 +71,29 @@ body.calibrate #bottom > * {
 /* COLUMN WIDTHS, SHARED BETWEEN TOP AND BOTTOM SECTIONS */
 #top .left, #bottom .left {
   left: 0;
-  width: 494px !important;
+  width: 485px !important;
 }
 
 #top .middle, #bottom .middle {
-  left: 528px;
-  width: 494px !important;
+  left: 521px;
+  width: 489px !important;
 }
 
 #top .right, #bottom .right {
-  left: 1060px;
+  left: 1055px;
 }
 
 /* TOP SECTION COLUMN HEIGHTS */
 #top .left {
-  height: 276px !important;
+  height: 253px !important;
 }
 
 #top .middle {
-  height: 279px !important;
+  height: 255px !important;
 }
 
 #top .right {
-  height: 281px !important;
+  height: 257px !important;
 }
 
 /* BOTTOM SECTION COLUMN HEIGHTS */
@@ -103,6 +103,7 @@ body.calibrate #bottom > * {
 }
 
 #bottom .left {
+  margin-top: 4px !important;
   height: 476px !important;
 }
 
@@ -110,8 +111,8 @@ body.calibrate #bottom > * {
 /* TOP-MARGIN + HEIGHT == MAX HEIGHT OF ALL BOTTOM WINDOWS */
   margin-top: 4px !important;
   height: 472px !important;
-  left: 526px;
-  width: 496px !important;
+/*  left: 522px;
+  width: 492px !important; */
 }
 
 #bottom .right {
