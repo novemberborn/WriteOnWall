@@ -7,9 +7,15 @@ Script which reads
 
 
 readerMap = {
+# mediamatic bank installation
     "A3T6PWTJ": "like",
     "A3T6PYXZ": "made",
-    "A3T6PWYP": "clear"
+    "A3T6PWYP": "clear",
+
+# esn installation
+    "A3S2IZQF": "made",
+    "A3S4BA8T": "like",
+    "A3T6PYW0": "clear"
     }
 
 
