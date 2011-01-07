@@ -59,7 +59,7 @@ class TagReceiverService (service.Service):
     def on_tag_removed(self, event):
         print "TAG REMOVED:"
         print event.data
-        agent.request("DELETE", "http://wowserver:8080/tag" % options['id'], Headers({}), StringProducer(event.data))
+        agent.request("DELETE", "http://wowserver:8080/tag/%s" % options['id'], Headers({}), StringProducer(event.data))
 
 
 class Options(usage.Options):
