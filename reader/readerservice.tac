@@ -71,6 +71,7 @@ class TagReceiverService (service.Service):
         s = event.service.serial
         if s in readerMap:
             id = readerMap[s]
+            print "Posting: %s with tag: %s" % (id, event.data)
         else:
             print "*** UNKNOWN READER! %s - using 'like'." % s
             id = "like"

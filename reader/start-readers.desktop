@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Start WoW! RFID readers
+Exec=gnome-terminal -e "twistd -r glib2 -ny /home/mediamatic/devcamps/camp10/wow/reader/readerservice.tac" -t "WoW RFID readers"
+Icon=totem
+Terminal=false
+Type=Application
+Categories=GTK;GNOME;AudioVideo;Player;Video;
