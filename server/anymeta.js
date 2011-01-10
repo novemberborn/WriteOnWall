@@ -1,9 +1,11 @@
 var request = require("promised-io/http-client").request,
-    toQueryString = require("promised-io/querystring").toQueryString;
+    toQueryString = require("promised-io/querystring").toQueryString,
+    parseUrl = require("url").parse;
 
 var config, oauth;
 exports.setup = function(newConfig){
   config = newConfig;
+  config.entrypoint = parseUrl(config.entrypoint);
   oauth = new (require("oauth").OAuth)("", "", config.c_key, config.c_sec, "1.0", null, "HMAC-SHA1");
 };
 
@@ -12,21 +14,22 @@ var makeRequest = function(httpMethod, apiMethod, params){
   params.method = apiMethod;
   params.format = "json";
   
-  var url = config.entrypoint + "?" + toQueryString(params);
+  var url = config.entrypoint.href + "?" + toQueryString(params);
   var signed = oauth.signUrl(url, config.t_key, config.t_sec, httpMethod);
   var query = signed.split("?").slice(1).join("?");
   
   var requestObj = {
     method: httpMethod,
-    hostname: "www.mediamatic.net",
-    pathInfo: "/services/rest/"
+    protocol: config.entrypoint.protocol,
+    hostname: config.entrypoint.hostname,
+    pathInfo: config.entrypoint.pathname
   };
   if(httpMethod == "GET" || httpMethod == "DELETE"){
     requestObj.queryString = query;
   }else{
     requestObj.body = [query];
     requestObj.headers = {
-      host: "www.mediamatic.net",
+      host: config.entrypoint.hostname,
       "Content-Type": "application/x-www-form-urlencoded",
       // Set Content-Length to prevent chunking, which Anymeta doesn't like
       "Content-Length": query.length
